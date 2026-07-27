@@ -192,6 +192,10 @@ class DataProvider:
       if code == 200:
         self.msg(resp)
         data["sleep_time"] = resp.get("next_poll_s",30)
+        s_time = resp.get("server_time", None)
+        s_off  = resp.get("tz_offset_seconds", None)
+        if s_time and s_off:
+          data["server_time"] = s_time + s_off
       else:
         raise RuntimeError(f"/status: unexpected HTTP return code {code}")
 

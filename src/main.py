@@ -114,6 +114,11 @@ class App(UIApplication):
   def run_end(self):
     """ Hook to execute at end of run(): save token """
     self._write_nvram()
+    s_time = self.data.get("server_time", None)
+    if s_time:
+      self.msg(f"updating RTCs to: {s_time}")
+      self.hal.update_rtc(s_time)
+      self.msg(f"now: {self._rtc_ext.print_ts(None, time.localtime())}")
 
   # --- read persisted data   ------------------------------------------------
 
@@ -234,8 +239,7 @@ start = time.monotonic()
 data_provider = DataProvider()
 ui_provider = UIProvider()
 
-app = App(data_provider,ui_provider,
-          with_rtc=getattr(app_config, "with_rtc", False))
+app = App(data_provider,ui_provider)
 atexit.register(at_exit,app)
 
 if getattr(app_config,"debug",False):
