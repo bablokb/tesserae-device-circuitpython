@@ -43,7 +43,6 @@ secrets.retry     = 2
 app_config = Settings()
 #app_config.debug        = False
 app_config.always_on    = True     # should be off when running on batteries
-app_config.with_rtc     = False    # needed for local scheduling
 
 # application specific
 app_config.url       = "http://tesserae.local:8765"
