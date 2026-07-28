@@ -56,7 +56,7 @@ class App(UIApplication):
     if not hasattr(self.hal, "eink"):
       raise ValueError("'eink' not defined in hw_config")
 
-    self._token = None
+    self.token = None
     self._etag  = None
 
     # fill in attributes needed by data and ui-provider
@@ -94,7 +94,7 @@ class App(UIApplication):
   def run_start(self):
     """ Hook to execute at start of run() """
 
-    if self._token and self._etag:
+    if self.token and self._etag:
       self.msg("not reading NVRAM (have token and etag)")
       # This happens when running in a loop, so don't update on 304.
       self.data["304update"] = False
@@ -104,7 +104,7 @@ class App(UIApplication):
     self._read_nvram()
     # ... and force updates for normal displays or in case no etag exists
     self.data.update({
-      "token":        self._token,
+      "token":        self.token,
       "etag":         self._etag,
       "304update":    not self.hal.eink or not self._etag
       })
@@ -132,9 +132,9 @@ class App(UIApplication):
     if hasattr(app_config,"token"):
       # use hard coded token
       self.msg(f"using hard-coded token: {app_config.token}")
-      self._token = app_config.token
+      self.token = app_config.token
     else:
-      self._token = None
+      self.token = None
 
     self._magic = getattr(app_config, "magic", 0x4201)
     self.msg(f"reading data from NVRAM with magic: {self._magic}")
@@ -146,10 +146,10 @@ class App(UIApplication):
       return
 
     # read token with given length
-    if not self._token:
+    if not self.token:
       # read token
-      self._token = self.hal.nvram_read(3, buffer[2]).decode()
-      self.msg(f"token read from NVRAM: {self._token}")
+      self.token = self.hal.nvram_read(3, buffer[2]).decode()
+      self.msg(f"token read from NVRAM: {self.token}")
     offset = 3 + buffer[2]
     len_etag = self.hal.nvram_read(offset, 1)[0]
     self.msg(f"{len_etag=}")
@@ -175,7 +175,7 @@ class App(UIApplication):
     and it allows to invalidate an old token.
     """
 
-    if (self.data["token"] == self._token and
+    if (self.data["token"] == self.token and
         self.data["etag"] == self._etag):
       # no new data, nothing to save
       self.msg("not saving data (no change)")
@@ -187,7 +187,7 @@ class App(UIApplication):
       return
 
     # write data to NVRAM
-    self._token = self.data["token"]
+    self.token = self.data["token"]
     self._etag  = self.data["etag"]
     token = bytes(self.data["token"],'utf-8')
     if self._etag:
