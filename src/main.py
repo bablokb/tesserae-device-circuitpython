@@ -116,9 +116,13 @@ class App(UIApplication):
     self._write_nvram()
     s_time = self.data.get("server_time", None)
     if s_time:
-      self.msg(f"updating RTCs to: {s_time}")
+      self.msg(f"updating RTCs")
       self.hal.update_rtc(s_time)
-      self.msg(f"now: {self._rtc_ext.print_ts(None, time.localtime())}")
+      now = time.localtime()
+      self.msg("now: %04d-%02d-%02d %02d:%02d:%02d" % (
+        now.tm_year, now.tm_mon, now.tm_mday,
+        now.tm_hour, now.tm_min, now.tm_sec
+      ))
 
   # --- read persisted data   ------------------------------------------------
 
