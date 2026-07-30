@@ -74,7 +74,16 @@ class App(UIApplication):
       "dashboard":    self._alloc_bitmap(),
       })
 
-  # --- override idle-processing   --------------------------------------------
+    # This is POR, so read data ...
+    self._read_nvram()
+    # ... and force updates for normal displays or in case no etag exists
+    self.data.update({
+      "token":        self.token,
+      "etag":         self._etag,
+      "304update":    not self.hal.eink or not self._etag
+      })
+
+  # --- override idle-processing   -------------------------------------------
 
   def run_idle(self):
     """ Overriden to honor sleep_time set by data-provider """
@@ -89,31 +98,19 @@ class App(UIApplication):
       if self.process_events():
         return
 
-  # --- run at start of run()   ----------------------------------------------
-
-  def run_start(self):
-    """ Hook to execute at start of run() """
-
-    if self.token and self._etag:
-      self.msg("not reading NVRAM (have token and etag)")
-      # This happens when running in a loop, so don't update on 304.
-      self.data["304update"] = False
-      return
-
-    # This is POR, so read data ...
-    self._read_nvram()
-    # ... and force updates for normal displays or in case no etag exists
-    self.data.update({
-      "token":        self.token,
-      "etag":         self._etag,
-      "304update":    not self.hal.eink or not self._etag
-      })
-
   # --- run at end of run()   ------------------------------------------------
 
   def run_end(self):
     """ Hook to execute at end of run(): save token """
+
+    # update data in NVRAM and attributes in self
     self._write_nvram()
+
+    # cancel forced-update flag in case we are running in a loop
+    if self.token and self._etag:
+      self.data["304update"] = False
+
+    # set local time from server time
     s_time = self.data.get("server_time", None)
     if s_time:
       self.msg(f"updating RTCs")
@@ -249,10 +246,14 @@ atexit.register(at_exit,app)
 if getattr(app_config,"debug",False):
   app.msg(f"startup: {time.monotonic()-start:f}s")
 
-if not getattr(app_config,"always_on",False):
-  app.msg(f"running once")
-  app.run_once()
-else:
+if getattr(app_config,"always_on",False):
   app.msg(f"runing endless")
   while True:
     app.run()
+else:
+  while not app.token:
+    # stay online and loop until we have a valid token
+    # this loops twice for /discover and once for /register
+    app.run()
+  app.msg(f"running once")
+  app.run_once()
