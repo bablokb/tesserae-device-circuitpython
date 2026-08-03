@@ -37,15 +37,15 @@ Status
 
 This list is not a priority list.
 
-  - [ ] Support "on/off" or "on/deep-sleep" workflows for devices
-        running on batteries 
+  - [ ] Improve documentation
   - [ ] Support memory constrained systems by caching files on SD
   - [ ] Add example configurations for more hardware devices
   - [ ] Support buttons
   - [ ] Automated setup of PiOS based clients (using cloud-init)
   - [ ] Support touch displays
-  - [ ] Client side scheduled wakeup and polling
-  - [ ] Improve documentation
+  - [X] Client side scheduled wakeup and polling
+  - [X] Support "on/off" or "on/deep-sleep" workflows for devices
+        running on batteries
   - [X] Honor ETAG / 304 on e-ink displays
   - [X] Memory optimized download of dashboards 
   - [X] Application configuration
