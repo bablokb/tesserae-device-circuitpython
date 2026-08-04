@@ -7,8 +7,13 @@ Generic Tesserae Device Firmware
 Overview
 --------
 
-This repository implements a [Tesserae](https://github.com/dmellok/tesserae)
-client using CircuitPython.
+This repository implements a
+[Tesserae](https://github.com/dmellok/tesserae) client using
+CircuitPython. Tesserae is a dashboard server, the role of the client
+is to poll for an updated dashboard and display it on a display. For
+alternative (native) clients and to learn about the full power of
+Tesserae, visit the Tesserae repository or the [Tesserae
+dokumentation](https://docs.tesserae.ink/).
 
 CircuitPython runs on as of today 655 boards. It also runs on a normal
 laptop/PC using Blinka. So the rationale of this project is to provide
@@ -71,7 +76,7 @@ Another aspect is support for deep-sleep. While the Inky-Frames
 support very low power states due to special hardware, other
 RP2xxx-devices use much more energy compared to ESP32xx
 systems. Mainline CircuitPython doesn't even have support for
-deep-sleep at all.
+RP2350 deep-sleep at all.
 
 
 Tested Devices
@@ -82,7 +87,7 @@ Successfully tested:
   - **Pico-W with SharpMemory-Display (420x200)**
   - **Inky-Impression 7.3** (Spectra6) with Pico2-W (with adapter)
   - **Adafruit MagTag**
-  - **Blinka with PyGame-Displayio** on Linux
+  - **Blinka with PyGame-Displayio** on Linux, Pi3, Pi5
   - **Blinka with PyGame-Displayio** on MacOS
 
 Failed devices:
