@@ -116,10 +116,7 @@ class App(UIApplication):
       self.msg(f"updating RTCs")
       self.hal.update_rtc(s_time)
       now = time.localtime()
-      self.msg("now: %04d-%02d-%02d %02d:%02d:%02d" % (
-        now.tm_year, now.tm_mon, now.tm_mday,
-        now.tm_hour, now.tm_min, now.tm_sec
-      ))
+      self.msg("now:", now)
 
   # --- read persisted data   ------------------------------------------------
 
