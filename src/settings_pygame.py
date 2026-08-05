@@ -59,7 +59,7 @@ else:
   width = int(width)
   height = int(height)
 
-if width == 0 and height == 0:
+if disp_type == "fullscreen" or (width == 0 and height == 0):
   flags = pygame.FULLSCREEN
 else:
   flags = 0
