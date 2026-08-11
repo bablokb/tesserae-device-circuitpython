@@ -57,6 +57,7 @@ class DataProvider:
                               self._data["device_id"],
                               self._data["width"],
                               self._data["height"],
+                              self._data["rotation"],
                               self._data["format"],
                               self._data["gamut"],
                               self._data["mac"])
