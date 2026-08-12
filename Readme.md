@@ -30,7 +30,7 @@ and boards, two additional levels of abstraction are necessary. A
 *hardware abstraction layer* (HAL) and a *configuration layer*. The
 HAL will deal with board-specific peripherals (e.g. buttons, low-power
 electronics), while the configuration layer allows a given board to run
-with different displays.
+with different peripherals (e.g. displays or buttons).
 
 The core take away is: this client will not automagically run on any
 device. But to make it run, it is only necessary to create a suitable
@@ -70,7 +70,7 @@ ESP32S2/ESP32S3 base systems with PSRAM are usually a better choice
 than other systems. E.g. the Inky-Frame 5.7 has a display with 600x448
 pixels and is driven by an embedded Pico-W. This combination cannot
 download the dashboard and update the display in one go. The second
-generation Inky-Frame 7.3 with a Pico2-W in contrast should work.
+generation Inky-Frame 7.3 with a Pico2-W in contrast does work.
 
 Another aspect is support for deep-sleep. While the Inky-Frames
 support very low power states due to special hardware, other
@@ -133,22 +133,14 @@ The file creates three `Settings`-objects:
   - `app_config`: application configuration
   - `hw_config`: hardware configuration
 
-Use one of the examples in `contrib/` as a basis for the necessary
-hardware configuration. Either merge the example into your
-`settings.py`, or create `src/local`, copy the example to `src/local`
-and add an import statement to your `settings.py`:
+For all the details about `secrets` and `hw_config`, see the [base app
+documentation](https://github.com/bablokb/circuitpython-base-app/config-reference-md).
 
-    from local.bla import hw_config
+Some simpler hardware configuration examples and HOWTOs are in [hw_config
+examples](./docs/hw_config.md).
 
-Note that `src/local` is not tracked by git, these files are local to
-your clone. If you create a useful hardware-config file, copy it to
-`contrib/` and create a PR.
-
-
-Examples
---------
-
-Some examples and screenshots are (i.e. will be) in `examples/`.
+The reference for application specific configuration is
+[here}(./docs/app_config.md).
 
 
 Contributing
