@@ -14,6 +14,10 @@ import os
 import pygame
 from blinka_displayio_pygamedisplay import PyGameDisplay
 
+# --- value holder class   ---------------------------------------------------
+
+class Settings:
+  pass
 
 # --- pygame display that keeps the window alive on macOS   ------------------
 
@@ -29,45 +33,6 @@ class TesseraePyGameDisplay(PyGameDisplay):
   def check_quit(self, delay=0.05):
     pygame.event.pump()
     return super().check_quit(delay=delay)
-
-# display-sizes: tuple of (width,height,gamut)
-
-DISPLAY_TYPES = {
-  "fullscreen":  (  0,   0, "rgb16"),
-  "native":      (900, 600, "rgb24"),
-  "native600":   (600, 400, "rgb16"),
-  "what":        (400, 300, "mono"),
-  "ii4_old":     (640, 400, "acep_7colour"),
-  "ii4":         (600, 400, "spectra_6"),
-  "ii5.7_old":   (600, 448, "acep_7colour"),
-  "ii5.7":       (600, 448, "spectra_6"),
-  "ii7.3_old":   (800, 480, "acep_7colour"),
-  "ii7.3":       (800, 480, "spectra_6"),
-  "iframe5.7":   (600, 448, "acep_7colour"),
-  "badger2040w": (296, 128, "mono"),
-  "magtag":      (296, 128, "gray_4"),
-  "sunton-2424": (240, 240, "rgb16"),
-  "sharp400":    (400, 240, "mono"),
-  }
-
-disp_type = os.getenv("TESSERAE_DISPLAY", default="native")
-if disp_type in DISPLAY_TYPES:
-  width, height, gamut  = DISPLAY_TYPES[disp_type]
-else:
-  # try to parse disp_type
-  width, height, gamut = disp_type.split(',')
-  width = int(width)
-  height = int(height)
-
-if disp_type == "fullscreen" or (width == 0 and height == 0):
-  flags = pygame.FULLSCREEN
-else:
-  flags = 0
-
-CAPTION = "Tesserae-Client"
-
-class Settings:
-  pass
 
 # --- helper-function for HAL   ----------------------------------------------
 
@@ -91,9 +56,61 @@ def _get_display(hal):
     pygame.display.flip()
   return display
 
+# --- MAC generator   --------------------------------------------------------
+
+def gen_mac(s):
+  """ create pseudo-MAC """
+  try:
+    import zlib
+    smac = f"{zlib.crc32(bytes(s,'utf-8')):0x}".upper()
+    return MAC_OUI+":"+":".join([smac[i:i+2] for i in range(0,6,2)])
+  except:
+    # give up
+    return None
+
+# --- select display from environment   --------------------------------------
+
+try:
+  # local override
+  from local.pygame_display_info import PYGAME_DISPLAYS, MAC_OUI
+except:
+  # distribution defaults
+  from pygame_display_info import PYGAME_DISPLAYS, MAC_OUI
+
+display_info = os.getenv("TESSERAE_DISPLAY", default="native")
+if display_info in PYGAME_DISPLAYS:
+  # this is a pre-defined display
+  width, height, gamut, mac  = PYGAME_DISPLAYS[display_info]
+else:
+  # ad-hoc defined display
+  # try to parse info as: (display_name[, width, height[, gamut[, mac]]])
+  dinfo    = display_info.split(',')
+  display_name = dinfo[0]
+  width        = int(dinfo[1]) if len(dinfo) > 2 else 0
+  height       = int(dinfo[2]) if len(dinfo) > 2 else 0
+  gamut        = dinfo[3]      if len(dinfo) > 3 else "rgb16"
+  mac          = dinfo[4]      if len(dinfo) > 4 else gen_mac(display_info)
+
+if display_name.startswith("fullscreen") or (width == 0 and height == 0):
+  flags = pygame.FULLSCREEN
+else:
+  flags = 0
+
+if display_name in ["fullscreen90",]:
+  rotation = 90
+elif display_name in ["fullscreen270",]:
+  rotation = 270
+else:
+  rotation = 0
+
+CAPTION = f"Tesserae-Client ({display_name})"
+
 # hardware configuration   ---------------------------------------------------
 
 hw_config = Settings()
 hw_config.get_display = _get_display
 hw_config.gamut = gamut
 hw_config.eink  = False
+if mac:
+  hw_config.mac   = mac
+hw_config.rotation = rotation
