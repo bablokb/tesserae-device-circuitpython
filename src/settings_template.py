@@ -86,7 +86,7 @@ if disp_name:
   app_config.name      = f"{hostname} emulating {disp_name}"
 
   # create app_config.mac only when manually configured
-  if not getattr(hw_config, "mac", None):
+  if getattr(hw_config, "mac", None):
     app_config.mac = hw_config.mac
 
   # settings_pygame will set rotation parameter for special cases
