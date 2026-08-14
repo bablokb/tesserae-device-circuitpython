@@ -81,6 +81,7 @@ display_info = os.getenv("TESSERAE_DISPLAY", default="native")
 if display_info in PYGAME_DISPLAYS:
   # this is a pre-defined display
   width, height, gamut, mac  = PYGAME_DISPLAYS[display_info]
+  display_name = display_info
 else:
   # ad-hoc defined display
   # try to parse info as: (display_name[, width, height[, gamut[, mac]]])
