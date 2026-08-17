@@ -11,7 +11,7 @@ display.
 
 Run the following commands to install the environment:
 
-    #sudo apt-get -y install swig
+    #sudo apt-get -y install swig python3-dev
     python3 -m venv --system-site-packages venv.tesserae.cp-client
     . venv.tesserae.cp-client/bin/activate
     pip install blinka-displayio-pygamedisplay
@@ -41,18 +41,18 @@ Then, start the client with:
 
     (cd src; TESSERAE_DISPLAY=native python3 ./main.py)
 
-For a list of valid displays to emulate, see `src/settings_pygame.py`.
+All emulated displays are defined in `src/pygame_display_info.py`. To
+override settings (e.g. MAC-addresses), copy the file to `src/local`
+and edit it there.
 
-If you emulate multiple displays, make sure to add a fixed MAC-address
-for every emulated display. One way to implement this is to
-add a few lines to `src/settings.py`:
+As an alternative to pre-defined displays, you can pass the display
+configuration directly via `TESSERAE_DISPLAY`:
 
-    disp_type = os.getenv("TESSERAE_DISPLAY")
-    if disp_type == "native":
-      pass                     # uses hardware MAC
-    elif disp_type == "ii7.3":
-      app_config.mac = "DE:AD:BE:EF"
-    ...
+    TESSERAE_DISPLAY="name,width,height[,gamut[,[MAC]]]".
+
+`gamut` defaults to `rgb16`. An empty MAC but a trailing comma will
+select the hardware MAC. A missing MACs will autogenerate a stable MAC
+based on the value of `TESSERAE_DISPLAY`.
 
 Note: all software prereqs are also available for MacOS and Windows.
 macOS is confirmed working — see [macOS Install](./mac-install.md); it

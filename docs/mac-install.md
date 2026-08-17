@@ -64,16 +64,23 @@ stable across runs:
 
     app_config.mac = "02:00:00:ca:fe:01"
 
+If not set explicitly, the MAC is either from
+`src/pygame_display_info.py`, or calculated from the value of
+`TESSERAE_DISPLAY`. See the configuration section in
+[pc-install.md](./pc_install.md) for details.
+
 
 5. Run
 ------
 
 Use the helper script, which sets the env vars above for you:
 
-    ./run-mac.sh                    # emulate the "native" display
-    TESSERAE_DISPLAY=ii4 ./run-mac.sh
+    ./scripts/run-mac.sh                  # emulate the "native" display
+    TESSERAE_DISPLAY=ii4 ./scripts/run-mac.sh
 
-For a list of valid displays to emulate, see `src/settings_pygame.py`.
+All emulated displays are defined in `src/pygame_display_info.py`. To
+override settings (e.g. MAC-addresses), copy the file to `src/local`
+and edit it there.
 
 Note: launch it from a normal Terminal (Terminal.app / iTerm), i.e. a
 real GUI login session. A pygame window created from a background /

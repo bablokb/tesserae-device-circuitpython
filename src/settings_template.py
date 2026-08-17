@@ -45,13 +45,19 @@ except:
 app_config = Settings()
 app_config.url       = "http://tesserae.local:8765"
 app_config.name      = "Kitchen Dashboard"
+app_config.app_name  = "Tesserae-Client"  # only necessary for Blinka+PyGame
 app_config.device_id = "inky_7_3"
 app_config.debug     = False
 app_config.debug_api = False
-app_config.always_on = False    # use power-off or deep-sleep
-#app_config.rotation =          # force server-side content rotation
-#app_config.pairing_code =      # use pairing code
-#app_config.magic =             # invalidates a stored token
+app_config.always_on = False          # use power-off or deep-sleep
+#app_config.run_interval = 60         # fallback run-interval
+
+#app_config.format   = "bmp"          # "bmp" or "png" (currently only "bmp")
+#app_config.rotation =                # force server-side content rotation
+#app_config.mac = "02:00:00:AA:BB:CC" # override MAC autodetection
+#app_config.pairing_code =            # use pairing code
+#app_config.magic =                   # invalidates a stored token
+#app_config.token =                   # hardwire the token
 
 # time-table configuration: one entry for every day starting at Monday
 # Format: (h_start, h_end, h_interval), (m_start, m_end, m_interval)

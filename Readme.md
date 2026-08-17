@@ -28,9 +28,9 @@ afterwards.
 While CircuitPython already provides a stable API across architectures
 and boards, two additional levels of abstraction are necessary. A
 *hardware abstraction layer* (HAL) and a *configuration layer*. The
-HAL will deal with board-specific peripherals (e.g. buttons, low-power
-electronics), while the configuration layer allows a given board to run
-with different peripherals (e.g. displays or buttons).
+HAL will deal with builtin board-specific peripherals (e.g. buttons,
+low-power electronics), while the configuration layer allows a given
+board to run with different peripherals (e.g. displays or buttons).
 
 The core take away is: this client will not automagically run on any
 device. But to make it run, it is only necessary to create a suitable
@@ -42,12 +42,12 @@ Status
 
 This list is not a priority list.
 
-  - [ ] Improve documentation
   - [ ] Support memory constrained systems by caching files on SD
   - [ ] Add example configurations for more hardware devices
   - [ ] Support buttons
   - [ ] Automated setup of PiOS based clients (using cloud-init)
   - [ ] Support touch displays
+  - [X] Improve documentation
   - [X] Client side scheduled wakeup and polling
   - [X] Support "on/off" or "on/deep-sleep" workflows for devices
         running on batteries
@@ -127,26 +127,12 @@ The central configuration file is `src/settings.py` which is not
 tracked by the repository. Copy the blueprint `src/settings_template.py`
 to `src/settings.py` and edit where appropriate.
 
-The file creates three `Settings`-objects:
+Read the [configuration guide](./docs/configuration.md) for all the details.
 
-  - `secrets`: WLAN credentials (only needed for real hardware)
-  - `app_config`: application configuration
-  - `hw_config`: hardware configuration
-
-For all the details about `secrets` and `hw_config`, see the [base app
-documentation](https://github.com/bablokb/circuitpython-base-app/config-reference-md).
-
-Some simpler hardware configuration examples and HOWTOs are in [hw_config
-examples](./docs/hw_config.md).
-
-The reference for application specific configuration is
-[here}(./docs/app_config.md).
+See `contrib/` for real life hardware configuration examples.
 
 
 Contributing
 ------------
 
-For new HAL files for specific hardware boards create a PR in the
-Base App repo.
-
-To add a configuration layer example, create a PR here.
+PRs, e.g. configuration layer examples, are welcome.
