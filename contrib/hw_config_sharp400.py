@@ -1,9 +1,9 @@
 # ----------------------------------------------------------------------------
-# settings_sharp400.py: Settings for a Sharp Memory Display.
+# hw_settings_sharp400.py: Settings for a Sharp Memory Display.
 #
-# Merge with your settings.py or copy to src/local, adapt and use:
+# Merge with your settings.py or copy to src/local, adapt as needed and use:
 #
-#    from local.settings_sharp400 import hw_config
+#    from local.hw_config_sharp400 import hw_config
 #
 # Website: https://github.com/bablokb/tesserae-device-circuitpython
 # ----------------------------------------------------------------------------
