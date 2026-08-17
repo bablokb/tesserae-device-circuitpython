@@ -1,10 +1,10 @@
 # ----------------------------------------------------------------------------
-# settings_inky_impression.py: Hardware-settings specific to Pimoroni
-#                              Inky-Impression displays.
+# hw_config_inky_impression.py: Hardware-settings specific to Pimoroni
+#                               Inky-Impression displays.
 #
 # Merge with your settings.py or copy to src/local, adapt and use:
 #
-#    from local.settings_inky_impression import hw_config
+#    from local.hw_config_inky_impression import hw_config
 #
 # Author: Bernhard Bablok
 # License: GPL3
@@ -13,7 +13,6 @@
 # ----------------------------------------------------------------------------
 
 import board
-
 import busio
 from adafruit_bus_device.i2c_device import I2CDevice
 import struct
@@ -31,23 +30,7 @@ BUSY_PIN  = board.GPIO17
 BTN_PINS  = [board.GPIO5, board.GPIO6, board.GPIO16, board.GPIO24]
 LED_PIN   = board.GP14
 
-class Settings:
-  pass
-
-# hardware configuration (optional)  -----------------------------------------
-
-hw_config = Settings()
-hw_config.LED     = LED_PIN
-#hw_config.led_blink_init = 0.1
-#hw_config.led_blink_power_off = 0.1
-hw_config.led_blink_data = 0.0
-#hw_config.led_blink_exception = 0.6
-
-hw_config.key_on  = 0 # pin A   (index into BTN_PINS)
-hw_config.key_upd = 1 # pin B
-hw_config.key_off = 2 # pin C
-
-# --- helper-function for Inky-displays   -------------------------------------
+# --- helper-function for Inky-displays   ------------------------------------
 
 def _get_inky_info():
   """ try to return tuple (width,height,color) """
@@ -94,14 +77,15 @@ def _get_display(hal):
   display.root_group = None
   return display
 
-def _get_keypad(hal):
-  """ return keypad for Inky-Impression """
-  import keypad
-  return keypad.Keys(BTN_PINS,
-                     value_when_pressed=False,pull=True,
-                     interval=0.1,max_events=4)
+# hardware configuration   ---------------------------------------------------
 
+class Settings:
+  pass
+
+hw_config             = Settings()
+hw_config.LED         = LED_PIN
+hw_config.BUTTONS     = [BTN_PINS, False, True]
 hw_config.get_display = _get_display
-hw_config.get_keypad = _get_keypad
-hw_config.eink = True
-hw_config.gamut = "spectra_6" if _inky_type == 'e673' else "acep_7colour"
+hw_config.eink        = True
+hw_config.gamut       = ("spectra_6" if _inky_type == 'e673' else
+                         "acep_7colour")
