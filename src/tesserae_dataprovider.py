@@ -89,10 +89,16 @@ class DataProvider:
 
   def discover(self):
     """ use discovery """
-    code, resp = self._api.discover()
+    code, headers, resp = self._api.discover()
+
+    # bail out (fatal errors):
     if code != 200:
-      # bail out
-      raise RuntimeError(f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
+      raise RuntimeError(
+        f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
+    if headers.get("x-tesserae-device-id-changed", "false") != "false":
+      raise RuntimeError(
+        f"error: duplicate MAC for device_id: {self._data['device_id']}")
+
     if resp.get("registered",False):
       self.msg(f"registered with token: {self._api.token}")
       self._data["token"] = self._api.token
@@ -105,7 +111,7 @@ class DataProvider:
 
   def register(self, pairing_code):
     """ use fallback registration """
-    code, resp = self._api.register(pairing_code)
+    code, headers, resp = self._api.register(pairing_code)
     if code != 201:
       # bail out
       raise RuntimeError(f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
@@ -188,7 +194,8 @@ class DataProvider:
 
     if code < 400:
       # send status (with battery information)
-      code, resp = self._api.status({"battery_mv": 1000*data["bat_level"]})
+      code, headers, resp = self._api.status(
+        {"battery_mv": 1000*data["bat_level"]})
       self.msg(f"api.status(): HTTP-code: {code}")
       if code == 200:
         self.msg(resp)
