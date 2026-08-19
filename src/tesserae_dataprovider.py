@@ -195,7 +195,10 @@ class DataProvider:
     if code < 400:
       # send status (with battery information)
       code, headers, resp = self._api.status(
-        {"battery_mv": 1000*data["bat_level"]})
+        {"battery_mv": 1000*data["bat_level"],
+         "fw_version": (f'CP client: {data["fw_version"]}/'+
+                        f'CP API: {self._panel.id["fw_version"]}'),
+         })
       self.msg(f"api.status(): HTTP-code: {code}")
       if code == 200:
         self.msg(resp)

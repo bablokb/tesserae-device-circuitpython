@@ -10,6 +10,8 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
+FIRMWARE_VERSION= "0.5.0"
+
 # --- imports   --------------------------------------------------------------
 
 import board
@@ -61,6 +63,7 @@ class App(UIApplication):
 
     # fill in attributes needed by data and ui-provider
     self.data.update({
+      "fw_version":   FIRMWARE_VERSION,
       "url":          app_config.url,
       "name":         getattr(app_config,"name", board.board_id),
       "device_id":    app_config.device_id,
