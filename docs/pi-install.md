@@ -41,3 +41,21 @@ directory, and install a systemd-service. The configuration file
 `/usr/local/lib/tesserae/tesserae-device-circuitpython/src`, but
 usually it is only necessary to change the value of `TESSERAE_DISPLAY`
 in `/etc/tesserae-device-circuitpython.conf`.
+
+
+Uing Read-Only Mode
+-------------------
+
+PiOS supports a special "read-only" mode which can be useful for a
+dashboard system. Since the Tesserae-client persists only the token
+and a hash of the last requested dashboard, the read-only mode will
+allow to just turn the system off without shutdown.
+
+For systems with a normal HDMI/DSI-display, there is no drawback. For
+e-ink systems, there is one additional dashboard request plus update
+at each power on.
+
+It is important to activate the read-only mode *after* the client
+registered with the server and stored the token. Use `raspi-config`,
+section "Performance" to activate the read-only mode. This can be
+undone again later, e.g. before an update of the firmware.
