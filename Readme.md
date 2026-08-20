@@ -108,16 +108,17 @@ or update the submodules after a normal clone:
     git clone https://github.com/bablokb/tesserae-device-circuitpython
     git submodule update --init --recursive
 
-See [PC/Laptop Install](./docs/pc-install.md) for how to install this
-client on a Linux-PC.
+See [PC/Laptop Installation](./docs/pc-install.md) for how to install this
+client on a Linux-PC, and [Pi Installation](./docs/pi-install.md) for the
+installation on a Raspberry Pi.
 
-See [macOS Install](./docs/mac-install.md) for how to install this
-client on a Mac. No macOS-specific HAL is needed: forcing Blinka to
-identify as a generic Linux-PC lets the existing `GENERIC_LINUX_PC`
-HAL be reused unchanged.
+[macOS Installation](./docs/mac-install.md) documents the Mac specific
+steps. No macOS-specific HAL is needed: forcing Blinka to identify as
+a generic Linux-PC lets the existing `GENERIC_LINUX_PC` HAL be reused
+unchanged.
 
-See [CircuitPython Device Install](./docs/mcu-install.md) for how to
-install this client on a MCU.
+Read [CircuitPython Device Installation](./docs/mcu-install.md) for
+how to install this client on a MCU.
 
 
 Configuration
