@@ -173,7 +173,7 @@ class DataProvider:
       self.msg(f"fetching dashboard for HTTP-code {code}")
       response = None
       try:
-        response = self._api.url_content(response_only=True)
+        response = self._api.url_content(io_obj=None)
         # adafruit_requests only supports a single request at a time,
         # so process it now before we call /status. The response
         # is closed automatically.
