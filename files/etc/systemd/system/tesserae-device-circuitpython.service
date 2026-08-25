@@ -1,0 +1,23 @@
+# ----------------------------------------------------------------------------
+# Systemd definition for tesserae-device-circuitpython.
+#
+# Use this service if the client runs on a Linux-type system with
+# Blinka and PyGame.
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/tesserae-devive-circuitpython
+# ----------------------------------------------------------------------------
+
+[Unit]
+Description=Tesserae-Client (CircuitPython)
+
+[Service]
+Type=simple
+User=tesserae_client
+Environment=XDG_RUNTIME_DIR=/usr/local/lib/tesserae_client
+ExecStart=/usr/local/bin/tesserae-device-circuitpython.sh
+
+[Install]
+WantedBy=network.target
