@@ -20,27 +20,25 @@ and not repeated here.
 Automatic Installation
 ----------------------
 
-The automatic installation script to turns your system into a
+Use the automatic installation script to turns your system into a
 dedicated dashboard system.
 
 The script assumes a pre-installed PiOS-lite (tested with
 Debian-Trixie). After cloning the repo, run:
 
-    scripts/pi-install.sh
+    sudo scripts/pi-install.sh
 
 The script first installs a number of system-packages needed for
 direct rendering in console mode. Then it will create a Python virtual
 environment just like the manual installation method does.
 
-** to be implemented soon:**
-
-The script will also create a system-user `tesserae` with
-HOME-directory `/usr/local/lib/tesserae`, create a venv in this
+The script will also create a system-user `tesserae_client` with
+HOME-directory `/usr/local/lib/tesserae_client`, create a venv in this
 directory, and install a systemd-service. The configuration file
-`settings.py` for the service is in
-`/usr/local/lib/tesserae/tesserae-device-circuitpython/src`, but
-usually it is only necessary to change the value of `TESSERAE_DISPLAY`
-in `/etc/tesserae-device-circuitpython.conf`.
+`settings.py` for the program is linked to
+`/etc/tesserae-device-circuitpython/settings.py`. Configure everything
+as needed there. Also, select the correct value of `TESSERAE_DISPLAY`
+in `/etc/tesserae-device-circuitpython/env.sh`.
 
 
 Uing Read-Only Mode
@@ -49,7 +47,7 @@ Uing Read-Only Mode
 PiOS supports a special "read-only" mode which can be useful for a
 dashboard system. Since the Tesserae-client persists only the token
 and a hash of the last requested dashboard, the read-only mode will
-allow to just turn the system off without shutdown.
+allow you to just turn the system off without shutdown.
 
 For systems with a normal HDMI/DSI-display, there is no drawback. For
 e-ink systems, there is one additional dashboard request plus update
