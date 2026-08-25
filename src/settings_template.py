@@ -42,6 +42,13 @@ except:
 
 # app configuration   --------------------------------------------------------
 
+# NOTE: this is the generic configuration section that works for all devices.
+#       Configuration on Systems running Blinka+PyGame is more generic, see
+#       the last code block in this file. The settings `name`, `app_name`
+#       and `device_id` are treated differently and therefore anything
+#       configured here will be overriden. So either set these values
+#       there or remove the relevant lines in the last code block.
+
 app_config = Settings()
 app_config.url       = "http://tesserae.local:8765"
 app_config.name      = "Kitchen Dashboard"
@@ -79,6 +86,8 @@ app_config.always_on = False          # use power-off or deep-sleep
 #   ]
 
 # --- emulation or PyGame appliance   ----------------------------------------
+
+# SEE NOTE ABOVE!
 
 disp_name = os.getenv("TESSERAE_DISPLAY")
 if disp_name:
