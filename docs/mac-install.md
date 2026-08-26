@@ -68,7 +68,7 @@ If not set explicitly, the MAC is either from
 `src/pygame_display_info.py` (override in
 `src/local/pygame_display_info.py`), or calculated from the value of
 `TESSERAE_DISPLAY`. See the configuration section in
-[pc-install.md](./pc_install.md) for details.
+[pc-install.md](./pc-install.md) for details.
 
 
 5. Run
