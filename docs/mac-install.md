@@ -54,7 +54,7 @@ printed.)
 4. Configure
 ------------
 
-Copy `src/settings_template.y` to `src/settings.py` and edit where
+Copy `src/settings_template.py` to `src/settings.py` and edit where
 appropriate (at minimum `app_config.url`).
 
 Note: the Linux HAL reads the MAC address from `/sys/class/net/`, which
@@ -65,7 +65,8 @@ stable across runs:
     app_config.mac = "02:00:00:ca:fe:01"
 
 If not set explicitly, the MAC is either from
-`src/pygame_display_info.py`, or calculated from the value of
+`src/pygame_display_info.py` (override in
+`src/local/pygame_display_info.py`), or calculated from the value of
 `TESSERAE_DISPLAY`. See the configuration section in
 [pc-install.md](./pc_install.md) for details.
 
