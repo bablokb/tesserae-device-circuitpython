@@ -95,7 +95,7 @@ if disp_name:
   disp_name = disp_name.split(',')[0]
   # put hostname in device_id and name
   import os
-  hostname = os.uname()[1]
+  hostname = os.uname()[1].split(".")[0]   # macOS reports "host.local"
   app_config.app_name  = f"Tesserae-{disp_name}"
   app_config.device_id = f"{hostname}_{disp_name.replace('.','')}"
   app_config.name      = f"{hostname} with display {disp_name}"
