@@ -96,6 +96,7 @@ class DataProvider:
       raise RuntimeError(
         f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
     if headers.get("x-tesserae-device-id-changed", "false") != "false":
+      del self._data["sleep_time"]
       raise RuntimeError(
         f"error: duplicate MAC for device_id: {self._data['device_id']}")
 
@@ -153,11 +154,11 @@ class DataProvider:
     if resp:
       self.msg(resp)
 
-    if code not in [200, 204, 304, 401]:
+    if code not in [200, 204, 304, 401, 404]:
       raise RuntimeError(f"/frame: unexpected HTTP return code {code}")
 
     # if token is invalid, delete and restart
-    if code == 401:
+    if code in [401, 404]:
       self.msg("invalid bearer token")
       self._api.token = None
       self._data["token"] = None
