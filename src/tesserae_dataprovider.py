@@ -96,7 +96,8 @@ class DataProvider:
       raise RuntimeError(
         f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
     if headers.get("x-tesserae-device-id-changed", "false") != "false":
-      del self._data["sleep_time"]
+      if "sleep_time" in self._data:
+        del self._data["sleep_time"]
       raise RuntimeError(
         f"error: duplicate MAC for device_id: {self._data['device_id']}")
 
