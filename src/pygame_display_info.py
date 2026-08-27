@@ -54,3 +54,7 @@ PYGAME_DISPLAYS = {
   "pi_touch2_10P": (1200, 1920, "rgb16", f"{MAC_OUI}:AD:BE:A4"),
   "pi_touch2_10L": (1920, 1200, "rgb16", f"{MAC_OUI}:AD:BE:A5"),
 }
+
+if __name__ == "__main__":
+  for key, value in PYGAME_DISPLAYS.items():
+    print(f"{key:15s}: {value}")
