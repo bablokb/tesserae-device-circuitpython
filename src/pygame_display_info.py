@@ -56,5 +56,9 @@ PYGAME_DISPLAYS = {
 }
 
 if __name__ == "__main__":
+  import sys
   for key, value in PYGAME_DISPLAYS.items():
-    print(f"{key:15s}: {value}")
+    if len(sys.argv) > 1 and sys.argv[1] == "1":
+      print(f"  {key:15s}: {value}")
+    else:
+      print(f"  {key:15s}")
