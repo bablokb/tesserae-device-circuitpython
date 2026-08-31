@@ -27,9 +27,15 @@ MCU Installation
      The first circup command installs the libraries listed above, the second
      is an example for installing the ST7789 driver library.
 
-  2. Clone the repository
+  2. Clone the repository recursively:
 
-  3. Copy `src/settings_template.py` to `src/settings.py` and adapt to your needs.
+        git clone --recurse-submodules \
+                  https://github.com/bablokb/tesserae-device-circuitpython
+        cd tesserae-device-circuitpython
+
+  3. Copy `src/settings_template.py` to `src/settings.py` and adapt to
+     your needs. Make sure to read the [configuration
+     guide](./docs/configuration.md).
 
   4. Copy the *content* of the `src/`-directory to your device. Don't copy the
      `src/` directory itself! Make sure that your copy-command does not copy
@@ -37,3 +43,6 @@ MCU Installation
      `rsync` and `cp` have the option `-L` that support this operation:
 
          rsync -avL src/ /mountpoint/of/device
+
+  5. Delete an existing `code.py` from the device. The default `code.py`
+     from a fresh CircuitPython install shadows the `main.py`.
