@@ -69,18 +69,33 @@ class DataProvider:
 
   # --- create bitmap   ------------------------------------------------------
 
-  def _create_bitmap(self, response):
-    """ create a bitmap, palette from the response """
+  def _create_bitmap(self):
+    """ create a bitmap, palette """
 
     gc.collect()
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory before imageload: {gc.mem_free()}")
+
+    # reuse existing bitmap if available
     if "dashboard" in self._data:
       bitmap = self._data["dashboard"][0]
     else:
       bitmap = None
-    self._data["dashboard"] = imageload.load(
-      imageload.ResponseReader(response), bitmap)
+
+    if self._data["format"] == "bmp":
+      response = self._api.url_content(io_obj=None)
+      # adafruit_requests only supports a single request at a time,
+      # so process it now before we call /status. The response
+      # is closed automatically.
+      self._data["dashboard"] = imageload.load(
+        imageload.ResponseReader(response), bitmap)
+    else:
+      import io
+      io_obj = self._api.url_content(io_obj=io.BytesIO(bytearray(0)))
+      self._data["dashboard"] = imageload.load(io_obj, bitmap)
+      io_obj.close()
+
+    gc.collect()
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory after imageload: {gc.mem_free()}")
     return
@@ -175,11 +190,7 @@ class DataProvider:
       self.msg(f"fetching dashboard for HTTP-code {code}")
       response = None
       try:
-        response = self._api.url_content(io_obj=None)
-        # adafruit_requests only supports a single request at a time,
-        # so process it now before we call /status. The response
-        # is closed automatically.
-        self._create_bitmap(response)
+        self._create_bitmap()
         data["updated"] = True
       except Exception as ex:
         self.msg("failed to create bitmap from response")
