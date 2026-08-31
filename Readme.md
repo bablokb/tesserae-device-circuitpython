@@ -47,6 +47,8 @@ This list is not a priority list.
   - [ ] Support buttons
   - [ ] Automated setup of PiOS based clients (using cloud-init)
   - [ ] Support touch displays
+  - [ ] Automatically choose format (BMP or PNG) based on free memory
+  - [X] Support PNG for systems with enough memory
   - [X] Improve documentation
   - [X] Client side scheduled wakeup and polling
   - [X] Support "on/off" or "on/deep-sleep" workflows for devices
