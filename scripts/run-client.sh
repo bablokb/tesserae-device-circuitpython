@@ -85,7 +85,6 @@ usage() {
     -s     only simulate\n\
     -d     print debug output\n\
 " >&2
-  exit 3
 }
 
 # parse arguments and set variables -------------------------------------------
@@ -96,13 +95,15 @@ parseArguments() {
       V) venv=$(realpath -q "$OPTARG");;
       S) src=$(realpath -q "$OPTARG");;
       L) action="list_displays";;
-    h) usage;;
+    h) usage
+       exit 0;;
     q) quiet=1;;
     v) verbose=1;;
     s) simulate=1;;
     d) debug=1;;
     ?) echo "error: illegal option: $OPTARG" >&2
-         usage;;
+       usage
+       exit 3;;
     esac
   done
   shift $((OPTIND-1))
@@ -129,19 +130,23 @@ checkArguments() {
   if [ ! -d "$src" ]; then
     msg "error" "client source-directory does not exist at: $src"
     usage
+    exit 3
   fi
   if [ "$action" = "run" ]; then
     if [ -z "$venv" ]; then
       msg "error" "no venv defined"
       usage
+      exit 3
     fi
     if [ ! -d "$venv" ]; then
       msg "error" "virtual environment does not exist at: $venv"
       usage
+      exit 3
     fi
     if [ -z "$display" ]; then
       msg "error" "missing display argument"
       usage
+      exit 3
     fi
   fi
 }
