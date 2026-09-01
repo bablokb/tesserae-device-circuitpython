@@ -170,11 +170,11 @@ class DataProvider:
     if resp:
       self.msg(resp)
 
-    if code not in [200, 204, 304, 401, 404]:
+    if code not in [200, 204, 304, 401, 403, 404]:
       raise RuntimeError(f"/frame: unexpected HTTP return code {code}")
 
     # if token is invalid, delete and restart
-    if code in [401, 404]:
+    if code in [401, 403, 404]:
       self.msg("invalid bearer token")
       self._api.token = None
       self._data["token"] = None
