@@ -23,12 +23,18 @@ dependencies, the option `--system-site-packages` reduces the
 necessary install time since it reuses already existing packages.
 
 
-Configuration
--------------
+Configuration and Running
+-------------------------
 
-Your `src/settings.py` should include the following lines to include
-some boilerplate code supporting Blinka-Displayio-PyGameDisplay (see
-`src/settings_template.py`):
+The central configuration file is `src/settings.py` which is not
+tracked by the repository. Copy the blueprint `src/settings_template.py`
+to `src/settings.py` and edit where appropriate.
+
+Read the [configuration guide](./docs/configuration.md) for all the
+details.
+
+If you don't use the template as a basis for your configuration file,
+make sure you include this boilerplate code into your `src/settings.py`:
 
     import board
     ...
@@ -36,23 +42,32 @@ some boilerplate code supporting Blinka-Displayio-PyGameDisplay (see
         board.board_id.startswith("RASPBERRY_PI")):
       from settings_pygame import hw_config
 
-Then, start the client with:
+After configuration, start the client e.g. with:
 
-    export VENV=...path-to-venv
-    TESSERAE_DISPLAY=native scripts/run-linux.sh
+    scripts/run-client.sh native
+
+The argument to the script is the name of the display to emulate. For a
+list of predefined displays, run
+
+    scripts/run-client.sh -v -L
 
 All emulated displays are defined in `src/pygame_display_info.py`. To
 override settings (e.g. MAC-addresses), copy the file to `src/local`
 and edit it there.
 
 As an alternative to pre-defined displays, you can pass the display
-configuration directly via `TESSERAE_DISPLAY`:
+configuration directly via:
 
-    TESSERAE_DISPLAY="name,width,height[,gamut[,[MAC]]]".
+    scripts/run-client.sh "name,width,height[,gamut[,[MAC]]]"
 
 `gamut` defaults to `rgb16`. An empty MAC but a trailing comma will
 select the hardware MAC. A missing MACs will autogenerate a stable MAC
-based on the value of `TESSERAE_DISPLAY`.
+based on the value of the display-string.
+
+The script `run-client.h` supports additional options. To print a short
+help, run:
+
+    scripts/run-client.sh -h
 
 Note: all software prereqs are also available for MacOS and Windows.
 macOS is confirmed working — see [macOS Installation](./mac-install.md); it

@@ -38,6 +38,10 @@ named 'pkg_resources'`.
 3. Force the Blinka board identity
 ----------------------------------
 
+Note: this is for documentation only. The generic run-script
+(`scripts/run-client.sh`, see below) will take care of exporting all
+necessary variables.
+
 `adafruit-platformdetect` does not recognise the "Darwin" platform and
 raises `NotImplementedError` from `import board` before any HAL is even
 selected. Tell Blinka to present itself as a generic Linux-PC:
@@ -51,39 +55,14 @@ HAL. (A harmless `GENERIC_X86 is not fully supported` warning is
 printed.)
 
 
-4. Configure
-------------
+4. Configuration and Running
+----------------------------
 
-Copy `src/settings_template.py` to `src/settings.py` and edit where
-appropriate (at minimum `app_config.url`).
+To start the client, execute `scripts/run-client.sh`. Read the
+relevant section in the [PC installation guide](./pc-install.md) for
+available options.
 
-Note: the Linux HAL reads the MAC address from `/sys/class/net/`, which
-does not exist on macOS, so it reports `None`. If your server keys
-devices by MAC, set a fixed value in `settings.py` so registration is
-stable across runs:
-
-    app_config.mac = "02:00:00:ca:fe:01"
-
-If not set explicitly, the MAC is either from
-`src/pygame_display_info.py` (override in
-`src/local/pygame_display_info.py`), or calculated from the value of
-`TESSERAE_DISPLAY`. See the configuration section in
-[pc-install.md](./pc-install.md) for details.
-
-
-5. Run
-------
-
-Use the helper script, which sets the env vars above for you:
-
-    ./scripts/run-mac.sh                  # emulate the "native" display
-    TESSERAE_DISPLAY=ii4 ./scripts/run-mac.sh
-
-All emulated displays are defined in `src/pygame_display_info.py`. To
-override settings (e.g. MAC-addresses), copy the file to `src/local`
-and edit it there.
-
-Note: launch it from a normal Terminal (Terminal.app / iTerm), i.e. a
-real GUI login session. A pygame window created from a background /
-non-interactive process may register in the app-switcher but never
-actually appear on screen.
+Note: launch the script from a normal Terminal (Terminal.app / iTerm),
+i.e. a real GUI login session. A pygame window created from a
+background / non-interactive process may register in the app-switcher
+but never actually appear on screen.
