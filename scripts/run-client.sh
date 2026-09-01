@@ -50,7 +50,7 @@ setDefaults() {
 
   # default for venv
   if [ -n "$VENV" ]; then
-    venv=$(realpath "$VENV")
+    venv=$(realpath -q "$VENV")
     return
   fi
 
@@ -61,7 +61,7 @@ setDefaults() {
     "$(dirname "$0")/../venv.tesserae.cp-client" \
     "$HOME/venv.tesserae" \
     "$HOME/venv.tesserae.cp-client"; do
-    d=$(realpath "$d")
+    d=$(realpath -q "$d")
     if [ -d "$d" ]; then
       venv="$d"
       break
@@ -93,8 +93,8 @@ usage() {
 parseArguments() {
   while getopts ":V:S:Lhqvsd" opt; do
     case $opt in
-      V) venv=$(realpath "$OPTARG");;
-      S) src=$(realpath "$OPTARG");;
+      V) venv=$(realpath -q "$OPTARG");;
+      S) src=$(realpath -q "$OPTARG");;
       L) action="list_displays";;
     h) usage;;
     q) quiet=1;;
