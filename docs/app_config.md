@@ -22,8 +22,8 @@ settings, see the sections below.
 | Attribute      | Type    | Mand. | Def.   | Description                 |
 |----------------|---------|-------|--------|-----------------------------|
 | url            | str     | yes   |        | URL of Tesserae-server      |
-| device_id      | str     | yes   |        | Technical ID of device      |
-| name           | str     | no    | ¹      | Pretty Name of device       |
+| device_id¹     | str     | no    |        | Technical ID of device      |
+| name           | str     | no    | ²      | Pretty Name of device       |
 | mac            | str     | no    |        | MAC-address as hex-string   |
 | format         | str     | no    | "bmp"  | dashboard image format      |
 | rotation       | int     | no    | 0      | one of 0, 90, 180, 270      |
@@ -33,12 +33,13 @@ settings, see the sections below.
 | always_on      | bool    | no    | False  | Run in a loop               |
 | debug          | bool    | no    | False  | Verbose app messages        |
 | debug_api      | bool    | no    | False  | Verbose API operation       |
-| app_name       | str     | yes²  |        | Local application name      |
+| app_name       | str     | no³   |        | Local application name      |
 | run_interval   | int     | no    | 60     | Fallback interval           | 
 | time_table     | list    | no    |        | Local scheduling            |
 
-¹ The name defaults to `board.board_id`
-² Mandatory only for PyGame-Blinka based systems
+¹ Legacy only - don't use for new configurations
+² The name defaults to `board.board_id`
+³ Mandatory only for Blinka/PyGame based systems
 
 
 url
@@ -50,8 +51,11 @@ The URL of the Tesserae server.
 device_id
 ---------
 
-This is the technical id of a device within Tesserae. No special
-characters (e.g. spaces) are allowed.
+This is the technical id of a device within Tesserae and is calculated
+automatically from `board.board_id` and the MAC-address (on
+Blinka-systems: hostname and MAC-address). Existing devices that are
+already registered should keep this setting.  Otherwise, don't set
+this value unless you know what you are doing.
 
 
 name
@@ -63,14 +67,14 @@ The pretty name of a device. Defaults to `board.board_id`.
 mac
 ---
 
-The MAC-address is usually auto detected. If not, set it explicitely.
+The MAC-address is usually auto detected. If not, set it explicitly.
 
 
 format
 ------
 
-The binary format of dashboards images. Currently only `bmp` is supported.
-Support for `png` is planned.
+The binary format of dashboards images. Suported formats: `bmp` and
+`png`.
 
 
 rotation
@@ -144,7 +148,17 @@ app_name
 Blinka/PyGame based systems usually don't have a NVRAM for persisting
 the token and etag of the dashboard. `app_config.app_name` will be
 used in this case to emulate the NVRAM in
-`$HOME/.local/share/Tesserae-<app_name>/nvram.data`.
+`$HOME/.local/share/<app_name>/nvram.data`.
+
+The default from `src/settings_template.py` uses
+
+   app_config.app_name = f"Tesserae-{disp_name}"
+
+Since the MAC-address is linked to the display-name, this will ensure
+stable operation as long as the MAC-address is not reused for different
+displays. This only happens if you use one of the fullscreen-variants
+(`fullscreen`, `fullscreen90` or `fullscreen270`), because these use
+the hardware MAC as the default.
 
 
 run_interval

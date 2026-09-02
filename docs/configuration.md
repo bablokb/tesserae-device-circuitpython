@@ -27,16 +27,23 @@ documentation](https://github.com/bablokb/circuitpython-base-app/config-referenc
 The reference for application specific configuration is
 [here](./docs/app_config.md).
 
-The next sections give some typical examples. These should serve as a blueprint
-for your own configuration.
-
-Note: 
+The next sections give some typical examples. These should serve as a
+blueprint for your own configuration.
 
 For devboards with builtin hardware, it makes more sense to create a
 hardware abstraction layer file (HAL) instead of using settings from
 `hw_config`. HALs are distributed with the
 [base-application](https://github.com/bablokb/circuitpython-base-app)
 and can be reused across different applications.
+
+Otherwise, `hw_config` needs at least three attributes:
+
+  - `gamut`
+  - `eink`
+  - `get_display`
+
+See the examples below and the files in the [contrib
+directory](../contrib/Readme.md).
 
 
 Minimal Example
@@ -56,9 +63,7 @@ display (i.e. the `board`-module has a `board.DISPLAY`-attribute:
     # application configuration
     app_config = Settings()
     app_config.url = "http://tesserae.local:8765/
-    app_config.device_id = "device_nr_1"
-    app_config.name = "Weather Info Kitchen"
-    app_config.app_name = "Tesserae-Client-1"
+    app_config.app_name = "Tesserae-Client-1"    # for Blinka/PyGame
 
     # hardware configuration
     hw_config = Settings()
@@ -70,10 +75,15 @@ Template Example
 ----------------
 
 The file `src/settings_template.py` is a bit more detailed. It creates
-a `secrets`-object like above. If you drop a `hw_config.py` into `src/local`,
-it will use this file the hardware configuration. Otherwise, it either creates
-a `hw_config`-object as shown in the previous example, or an object that
-is suitable for the Blinka-PyGame environment.
+all three configuration objects.
+
+If you drop a `my_hardware.py` into `src/local`, it will import
+`hw_config` from this file. Otherwise, it will fall back to the
+minimal `hw_config`-object from the previous example.
+
+The exception is an environment based on Blinka/PyGame: here it
+will create `hw_config` and `app_config`-settings that are suitable
+for that runtime.
 
 
 MCU With an External BusDisplay
