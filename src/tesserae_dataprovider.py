@@ -91,8 +91,12 @@ class DataProvider:
         imageload.ResponseReader(response), bitmap)
     else:
       import io
+      start = time.monotonic()
       io_obj = self._api.url_content(io_obj=io.BytesIO(bytearray(0)))
+      self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
+      start = time.monotonic()
       self._data["dashboard"] = imageload.load(io_obj, bitmap)
+      self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
       io_obj.close()
 
     gc.collect()
@@ -165,7 +169,9 @@ class DataProvider:
     # at this point we should have a token (or the pairing code is invalid)
     data["updated"] = False
     self._api.etag = data["etag"]
+    start = time.monotonic()
     code, resp = self._api.frame()
+    self.msg(f"/frame: {time.monotonic()-start:0.1f}s")
     self.msg(f"api.frame(): HTTP-code: {code}")
     if resp:
       self.msg(resp)
@@ -188,6 +194,7 @@ class DataProvider:
     # fetch dashboard data for HTTP200 and if requested
     if code == 200 or (code == 304 and data["304update"]):
       self.msg(f"fetching dashboard for HTTP-code {code}")
+      start = time.monotonic()
       response = None
       try:
         self._create_bitmap()
@@ -199,6 +206,7 @@ class DataProvider:
       finally:
         if response:
           response = None
+      self.msg(f"fetch dashboard: {time.monotonic()-start:0.1f}s")
 
     # cleanup and log memory state
     gc.collect()
@@ -207,11 +215,13 @@ class DataProvider:
 
     if code < 400:
       # send status (with battery information)
+      start = time.monotonic()
       code, headers, resp = self._api.status(
         {"battery_mv": 1000*data["bat_level"],
          "fw_version": (f'CP client: {data["fw_version"]}/'+
                         f'CP API: {self._panel.id["fw_version"]}'),
          })
+      self.msg(f"/status: {time.monotonic()-start:0.1f}s")
       self.msg(f"api.status(): HTTP-code: {code}")
       if code == 200:
         self.msg(resp)
