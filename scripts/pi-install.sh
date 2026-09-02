@@ -9,6 +9,7 @@
 # Website: https://github.com/bablokb/tesserae-device-circuitpython
 # --------------------------------------------------------------------------
 
+install_type="${1:-full}"
 PROJECT="tesserae-device-circuitpython"
 CONFIG="/etc/$PROJECT"
 SYS_USER="tesserae_client"
@@ -108,11 +109,18 @@ enable_services() {
 
 # --- main program   --------------------------------------------------------
 
-create_sys_user
-install_packages
-install_files
-install_client
-enable_services
-
-echo "Please edit $CONFIG/env.sh and $CONFIG/settings.py"
-echo "and run \"sudo systemctl start $PROJECT.service\" to activate changes"
+if [ "$install_type" = "full" ]; then
+  create_sys_user
+  install_packages
+  install_files
+  install_client
+  enable_services
+  echo "Please edit $CONFIG/env.sh and $CONFIG/settings.py"
+  echo "and run \"sudo systemctl start $PROJECT.service\" to activate changes"
+elif [ "$install_type" = "update" ]; then
+  install_client
+  echo "and run \"sudo systemctl restart $PROJECT.service\" to activate changes"
+else
+  echo "unknown install-type: $install_type"
+  exit 3
+fi

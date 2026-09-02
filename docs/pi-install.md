@@ -24,8 +24,10 @@ Use the automatic installation script to turns your system into a
 dedicated dashboard system.
 
 The script assumes a pre-installed PiOS-lite (tested with
-Debian-Trixie). After cloning the repo, run:
+Debian-Trixie). After cloning the repo (see instructions in the [main
+Readme](../Readme.md#Installation)), run:
 
+    cd tesserae-device-circuitpython
     sudo scripts/pi-install.sh
 
 The script first installs a number of system-packages needed for
@@ -39,6 +41,13 @@ directory, and install a systemd-service. The configuration file
 `/etc/tesserae-device-circuitpython/settings.py`. Configure everything
 as needed there. Also, select the correct value of `TESSERAE_DISPLAY`
 in `/etc/tesserae-device-circuitpython/env.sh`.
+
+The script can be run again without problems, but to speed up the
+process, run
+
+    sudo scripts/pi-install.sh update
+
+if you only want to update the client code.
 
 
 Uing Read-Only Mode
