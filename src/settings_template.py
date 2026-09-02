@@ -44,22 +44,21 @@ except:
 
 # NOTE: this is the generic configuration section that works for all devices.
 #       Configuration on Systems running Blinka+PyGame is more generic, see
-#       the last code block in this file. The settings `name`, `app_name`
-#       and `device_id` are treated differently and therefore anything
+#       the last code block in this file. The settings `name` are treated
+#       differently and therefore anything
 #       configured here will be overriden. So either set these values
 #       there or remove the relevant lines in the last code block.
 
 app_config = Settings()
 app_config.url       = "http://tesserae.local:8765"
-app_config.name      = "Kitchen Dashboard"
-app_config.app_name  = "Tesserae-Client"  # only necessary for Blinka+PyGame
-app_config.device_id = "inky_7_3"
+#app_config.name     = "Kitchen Dashboard"    # manual pretty name or
+#app_config.name     = board.board_id         # use this default
 app_config.debug     = False
 app_config.debug_api = False
 app_config.always_on = False          # use power-off or deep-sleep
 #app_config.run_interval = 60         # fallback run-interval
 
-#app_config.format   = "bmp"          # "bmp" or "png" (currently only "bmp")
+#app_config.format   = "bmp"          # "bmp" or "png"
 #app_config.rotation =                # force server-side content rotation
 #app_config.mac = "02:00:00:AA:BB:CC" # override MAC autodetection
 #app_config.pairing_code =            # use pairing code
@@ -97,7 +96,6 @@ if disp_name:
   import os
   hostname = os.uname()[1].split(".")[0]   # macOS reports "host.local"
   app_config.app_name  = f"Tesserae-{disp_name}"
-  app_config.device_id = f"{hostname}_{disp_name.replace('.','')}"
   app_config.name      = f"{hostname} with display {disp_name}"
 
   # create app_config.mac only when manually configured
