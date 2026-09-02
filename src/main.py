@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.6.0"
+FIRMWARE_VERSION= "0.7.0"
 
 # --- imports   --------------------------------------------------------------
 
@@ -66,7 +66,7 @@ class App(UIApplication):
       "fw_version":   FIRMWARE_VERSION,
       "url":          app_config.url,
       "name":         getattr(app_config,"name", board.board_id),
-      "device_id":    app_config.device_id,
+      "device_id":    getattr(app_config,"device_id", self._get_id()),
       "pairing_code": getattr(app_config,"pairing_code", None),
       "mac":          getattr(app_config,"mac", self.wifi.mac_address),
       "width":        self.display.width,
@@ -231,6 +231,60 @@ class App(UIApplication):
             None)
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory after Bitmap allocation: {gc.mem_free()}")
+
+  # --- helper for _sanitize   -----------------------------------------------
+
+  def _is_noise(self, tok):
+    """ check if token of board_id is noise """
+
+    # memory-config tokens: 4mbflash, 2mbpsram, nopsram, 16mb, n8r8, ...
+    if tok == "nopsram":
+      return True
+    if tok[0].isdigit() and tok.endswith(("mbflash", "mbpsram", "mb")):
+      return True
+    if (len(tok) >= 4 and tok[0] == "n" and "r" in tok
+        and tok[1:].replace("r", "").isdigit()):
+      return True
+    return False
+
+  # --- sanitize board_id   --------------------------------------------------
+
+  def _sanitize(self, limit=25):
+    """ cleanup board_id to match spec for device_id """
+
+    VENDORS = {
+      "adafruit": "af", "espressif": "esp", "waveshare": "ws",
+      "pimoroni": "pim", "sparkfun": "sfe", "unexpectedmaker": "um",
+    }
+
+    s = "".join(
+      c if c.isalpha() or c.isdigit() or c in "_-" else "_"
+      for c in board.board_id.lower())
+    toks = [t for t in s.split("_") if t and not self._is_noise(t)]
+    if toks and toks[0] in VENDORS:
+      toks[0] = VENDORS[toks[0]]
+    s = "_".join(toks)
+    if not s or not s[0].isalpha():
+      s = "b" + s
+    return s[:limit].rstrip("_-")
+
+  # --- auto-generate device_id   --------------------------------------------
+
+  def _get_id(self):
+    """ auto-generate device_id """
+
+    mac = (getattr(app_config,"mac",
+                   self.wifi.mac_address)[-8:].replace(':',''))
+    if self.is_pygame:
+      import os
+      disp_name = os.getenv("TESSERAE_DISPLAY")
+      # parse name (if complete config is provided from the environment)
+      disp_name = disp_name.split(',')[0].replace('.','')
+      # put hostname in device_id and name
+      hostname = os.uname()[1].split(".")[0]   # macOS reports "host.local"
+      return f"{hostname}_{disp_name}"[:25]+f"_{mac}"
+    else:
+      return f"{self._sanitize()}_{mac}"
 
 # --- main program   ---------------------------------------------------------
 
