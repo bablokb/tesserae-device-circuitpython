@@ -97,9 +97,9 @@ if display_name.startswith("fullscreen") or (width == 0 and height == 0):
 else:
   flags = 0
 
-if display_name in ["fullscreen90",]:
+if display_name.endswith("90"):
   rotation = 90
-elif display_name in ["fullscreen270",]:
+elif display_name.endswith("270"):
   rotation = 270
 else:
   rotation = 0
