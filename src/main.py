@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.7.0"
+FIRMWARE_VERSION= "0.8.0"
 
 # --- imports   --------------------------------------------------------------
 
@@ -76,6 +76,8 @@ class App(UIApplication):
       "gamut":        self.hal.gamut,
       "eink":         self.hal.eink,
       "dashboard":    self._alloc_bitmap(),
+      "dl_mode":      self._get_dl_mode(),
+      "dl_dir":       getattr(app_config, "dl_dir", "/"),
       })
 
     # This is POR, so read data ...
@@ -285,6 +287,31 @@ class App(UIApplication):
       return f"{hostname}_{disp_name}"[:25]+f"_{mac}"
     else:
       return f"{self._sanitize()}_{mac}"
+
+  # --- query download mode   ------------------------------------------------
+
+  def _get_dl_mode(self):
+    """ query/set download mode """
+
+    dl_mode = getattr(app_config, "dl_mode", "AUTO")
+    # sanitize illegal download modes
+    if dl_mode == "PYGAME" and not self.is_pygame:
+      dl_mode = "AUTO"
+    elif (dl_mode == "STREAM" and
+          not getattr(app_config,"format", "bmp") == "bmp"):
+      dl_mode = "AUTO"
+
+    # set download mode. TODO: check memory and also use RAM for bmp
+    if dl_mode == "AUTO":
+      if self.is_pygame:
+        dl_mode = "PYGAME"
+      elif getattr(app_config,"format", "bmp") == "bmp":
+        dl_mode = "STREAM"
+      else:
+        dl_mode = "RAM"
+
+    self.msg(f"using dl_mode: {dl_mode}")
+    return dl_mode
 
 # --- main program   ---------------------------------------------------------
 

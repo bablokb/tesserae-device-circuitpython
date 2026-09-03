@@ -27,6 +27,8 @@ settings, see the sections below.
 | mac            | str     | no    |        | MAC-address as hex-string   |
 | format         | str     | no    | "bmp"  | dashboard image format      |
 | rotation       | int     | no    | 0      | one of 0, 90, 180, 270      |
+| dl_mode        | str     | no    | "AUTO" | Download mode               |
+| dl_dir         | str     | no    | "/"    | Download directory          |
 | token          | str     | no    |        | Token code                  | 
 | pairing_code   | str     | no    |        | Pairing code                |
 | magic          | int     | no    | 0x4101 | Magic number                |
@@ -92,6 +94,40 @@ driver to rotate content to match physical dimensions of the hardware.
   - a Pi5 lite-system with a Pi-Touch-Display-2. These displays are always
     identified as portrait. If used in landscape mode, set the rotation
     value to `90` or `270`.
+
+
+dl_mode
+-------
+
+This sets the download mode. If unset, it defaults to `AUTO`.
+
+Automatic mode selects `PYGAME` for Blinka/PyGame environments.
+Otherwise, it uses `STREAM` if `format="bmp"` and `RAM` for "png".
+
+Supported values:
+
+  - `AUTO`: select a suitable mode automatically
+  - `STREAM`: create `Bitmap`-object reading directly from the socket
+  - `RAM`: buffer the image locally in RAM (using a `BytesIO`-object)
+  - `FSCACHE`: download the image to flash
+  - `PYGAME`: directly create a PyGame surface
+
+Illegal values (e.g. `STREAM` together with format "png") are silently
+replaced with `AUTO`.
+
+Note: `FSCACHE` is not implemented yet.
+
+
+dl_dir
+------
+
+The download directory to use. Only relevant for
+`dl_mode="FSCACHE"`. Typical values are `/sd`, `/saves` or `/`. The
+download directory must exist and must be mounted writable. The last
+option `dl_dir="/"` requires a CircuitPython version of at least
+10.3.0.
+
+Note: not implemented yet.
 
 
 token

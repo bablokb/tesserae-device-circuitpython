@@ -77,27 +77,43 @@ class DataProvider:
       self.msg(f"free memory before imageload: {gc.mem_free()}")
 
     # reuse existing bitmap if available
-    if "dashboard" in self._data:
-      bitmap = self._data["dashboard"][0]
-    else:
-      bitmap = None
+    dl_mode = self._data["dl_mode"]
+    if not dl_mode == "PYGAME":
+      if "dashboard" in self._data:
+        bitmap = self._data["dashboard"][0]
+      else:
+        bitmap = None
 
-    if self._data["format"] == "bmp":
+    # download to RAM or surface if required
+    if dl_mode in ["PYGAME", "RAM"]:
+      import io
+      start = time.monotonic()
+      io_obj = self._api.url_content(io_obj=io.BytesIO(bytearray(0)))
+      self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
+
+    # create PyGame surface if requested
+    if dl_mode == "PYGAME":
+      import pygame
+      start = time.monotonic()
+      self._data["dashboard"] = pygame.image.load(io_obj)
+      self.msg(f"pygame.image.load(): {time.monotonic()-start:0.1f}s")
+      io_obj.close()
+
+    # stream the bmp to the bitmap. main.py enforces bmp for STREAM
+    elif dl_mode == "STREAM":
       response = self._api.url_content(io_obj=None)
       # adafruit_requests only supports a single request at a time,
       # so process it now before we call /status. The response
       # is closed automatically.
       self._data["dashboard"] = imageload.load(
         imageload.ResponseReader(response), bitmap)
-    else:
-      import io
-      start = time.monotonic()
-      io_obj = self._api.url_content(io_obj=io.BytesIO(bytearray(0)))
-      self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
+    elif dl_mode == "RAM":
       start = time.monotonic()
       self._data["dashboard"] = imageload.load(io_obj, bitmap)
       self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
       io_obj.close()
+    else:
+      raise NotImplementedError(f"invalid download-mode {dl_mode}")
 
     gc.collect()
     if hasattr(gc,"mem_free"):

@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------
 
 import os
+import time
 import pygame
 from blinka_displayio_pygamedisplay import PyGameDisplay
 
@@ -33,6 +34,21 @@ class TesseraePyGameDisplay(PyGameDisplay):
   def check_quit(self, delay=0.05):
     pygame.event.pump()
     return super().check_quit(delay=delay)
+
+  def _refresh_display(self):
+    """ override base-class: handle PyGame surfaces directly """
+    surface = getattr(self.root_group, "surface", [])
+    if not isinstance(surface, list):
+      surface = [surface]
+    if len(surface):
+      for s in surface:
+        self._pygame_screen.blit(s, (0,0))
+      pygame.display.flip()
+      self._last_refresh = time.monotonic()
+      self._refresh_pending = False
+      return
+    else:
+      super()._refresh_display()
 
 # --- helper-function for HAL   ----------------------------------------------
 

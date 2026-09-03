@@ -54,13 +54,17 @@ class UIProvider:
     if not data.get("updated",False):
       return None
 
-    # palette could also be a ColorConverter
-    bitmap, palette = data["dashboard"]
-    if len(self._view):
-      self._view[0].bitmap = bitmap      # replace existing bitmap
-      gc.collect()
+    if data["dl_mode"] == "PYGAME":
+      # for a PyGame surface, attach it to the group
+      self._view.surface = data["dashboard"]
     else:
-      self._view.append(displayio.TileGrid(bitmap, pixel_shader=palette))
+      # palette could also be a ColorConverter
+      bitmap, palette = data["dashboard"]
+      if len(self._view):
+        self._view[0].bitmap = bitmap      # replace existing bitmap
+        gc.collect()
+      else:
+        self._view.append(displayio.TileGrid(bitmap, pixel_shader=palette))
     return self._view
 
   # --- clear UI and free memory   -------------------------------------------
