@@ -95,7 +95,7 @@ class DataProvider:
     if dl_mode == "PYGAME":
       import pygame
       start = time.monotonic()
-      self._data["dashboard"] = pygame.image.load(io_obj)
+      self._data["dashboard"] = pygame.image.load(io_obj).convert()
       self.msg(f"pygame.image.load(): {time.monotonic()-start:0.1f}s")
       io_obj.close()
 
