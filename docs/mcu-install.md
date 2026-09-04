@@ -37,10 +37,12 @@ MCU Installation
      your needs. Make sure to read the [configuration
      guide](./docs/configuration.md).
 
-  4. Copy the *content* of the `src/`-directory to your device. Don't copy the
-     `src/` directory itself! Make sure that your copy-command does not copy
-     the existing symlinks, but the directories and files they point to. Both
-     `rsync` and `cp` have the option `-L` that support this operation:
+  4. Copy the *content* of the `src/`-directory to your device. Don't
+     copy the `src` directory itself (note: *the trailing slash is
+     important in the command given below!*).  
+     Make sure that your copy-command does not copy the existing symlinks,
+     but the directories and files they point to. Both `rsync` and `cp`
+     have the option `-L` that support this operation:
 
          rsync -avL src/ /mountpoint/of/device
 
