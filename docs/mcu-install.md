@@ -29,9 +29,9 @@ MCU Installation
 
   2. Clone the repository recursively:
 
-        git clone --recurse-submodules \
+         git clone --recurse-submodules \
                   https://github.com/bablokb/tesserae-device-circuitpython
-        cd tesserae-device-circuitpython
+         cd tesserae-device-circuitpython
 
   3. Copy `src/settings_template.py` to `src/settings.py` and adapt to
      your needs. Make sure to read the [configuration
