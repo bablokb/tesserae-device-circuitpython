@@ -9,6 +9,7 @@
 # ----------------------------------------------------------------------------
 
 import atexit
+import board
 import busio
 import displayio
 import fourwire
