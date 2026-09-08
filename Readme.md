@@ -86,6 +86,8 @@ Tested Devices
 
 Successfully tested:
 
+  - **[SB-Components Enk-Pi](https://shop.sb-components.co.uk/products/enkpi)**
+  - **Pico-W with Adafruit legacy 1.54" tri-color e-ink (152x152)**
   - **Pico-W with SharpMemory-Display (420x200)**
   - **Inky-Impression 7.3** (Spectra6) with Pico2-W (with adapter)
   - **Adafruit MagTag**
