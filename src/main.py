@@ -77,7 +77,7 @@ class App(UIApplication):
       "eink":         self.hal.eink,
       "dashboard":    self._alloc_bitmap(),
       "dl_mode":      self._get_dl_mode(),
-      "dl_dir":       getattr(app_config, "dl_dir", "/"),
+      "dl_dir":       self._get_dl_dir(),
       })
 
     # This is POR, so read data ...
@@ -312,6 +312,20 @@ class App(UIApplication):
 
     self.msg(f"using dl_mode: {dl_mode}")
     return dl_mode
+
+  # --- query download directory   -------------------------------------------
+
+  def _get_dl_dir(self):
+    """ query/set download directory """
+
+    if getattr(app_config, "dl_mode", None) != "FSCACHE":
+      return None
+    if self.is_pygame:
+      dl_dir = getattr(app_config, "dl_dir", self.hal.get_appdir())
+    else:
+      dl_dir = getattr(app_config, "dl_dir", "/")
+    self.msg(f"using dl_dir: {dl_dir}")
+    return dl_dir
 
 # --- main program   ---------------------------------------------------------
 
