@@ -107,11 +107,25 @@ class DataProvider:
       # is closed automatically.
       self._data["dashboard"] = imageload.load(
         imageload.ResponseReader(response), bitmap)
+
+    # download to buffer first, then create the Bitmap-object
     elif dl_mode == "RAM":
       start = time.monotonic()
       self._data["dashboard"] = imageload.load(io_obj, bitmap)
       self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
       io_obj.close()
+
+    # download directly to a file
+    elif dl_mode == "FSCACHE":
+      dl_fname = f"{self._data['dl_dir']}/dashboard.{self._data['format']}"
+      dl_file = open(dl_fname,"wb")
+      start = time.monotonic()
+      self._api.url_content(io_obj=dl_file)
+      self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
+      dl_file.close()
+      self.msg(f"downloaded file to {dl_fname}")
+
+    # illegal mode
     else:
       raise NotImplementedError(f"invalid download-mode {dl_mode}")
 
@@ -214,7 +228,8 @@ class DataProvider:
       response = None
       try:
         self._create_bitmap()
-        data["updated"] = True
+        if data["dl_mode"] != "FSCACHE":
+          data["updated"] = True
       except Exception as ex:
         self.msg("failed to create bitmap from response")
         self.msg(f"  Exception: {ex}")
