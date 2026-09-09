@@ -1,9 +1,9 @@
 # ----------------------------------------------------------------------------
-# hw_config_IL0373.py: Settings for an IL0373 based display.
+# hw_config_il0373.py: Settings for an IL0373 based display.
 #
 # Merge with your settings.py or copy to src/local, adapt as needed and use:
 #
-#    from local.hw_config_st7789 import hw_config
+#    from local.hw_config_il0373 import hw_config
 #
 # Website: https://github.com/bablokb/tesserae-device-circuitpython
 # ----------------------------------------------------------------------------

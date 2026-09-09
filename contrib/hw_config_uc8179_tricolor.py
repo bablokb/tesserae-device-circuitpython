@@ -3,7 +3,7 @@
 #
 # Merge with your settings.py or copy to src/local, adapt as needed and use:
 #
-#    from local.hw_config_st7789 import hw_config
+#    from local.hw_config_uc8179_tricolor import hw_config
 #
 # This configuration is courtesy of Github user snowpie
 #
