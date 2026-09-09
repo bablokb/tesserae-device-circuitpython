@@ -324,8 +324,16 @@ class App(UIApplication):
       dl_dir = getattr(app_config, "dl_dir", self.hal.get_appdir())
     else:
       dl_dir = getattr(app_config, "dl_dir", "/")
-    self.msg(f"using dl_dir: {dl_dir}")
-    return dl_dir
+
+    # check if directory exists
+    import os
+    try:
+      os.listdir(dl_dir)
+      self.msg(f"using dl_dir: {dl_dir}")
+      return dl_dir
+    except OSError:
+      raise ValueError(
+        f"error: Invalid dl_dir configuration. {dl_dir} does not exist")
 
 # --- main program   ---------------------------------------------------------
 
