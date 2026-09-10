@@ -222,7 +222,7 @@ class App(UIApplication):
       "rgb24": 65535,
       }
     self.msg(
-      "creating Bitmap for display with" +
+      "creating Bitmap for display with " +
       f"{self.display.width}x{self.display.height}@{col_map[self.hal.gamut]}")
     gc.collect()
     if hasattr(gc,"mem_free"):
