@@ -16,6 +16,7 @@ import time
 from settings import app_config
 from tesserae_api import Tesserae_ID, Tesserae_API
 import imageload
+import status
 
 # --- main data-provider class   ---------------------------------------------
 
@@ -142,19 +143,23 @@ class DataProvider:
 
     # bail out (fatal errors):
     if code != 200:
+      self._data["status"] = status.ERR_UNKNOWN
       raise RuntimeError(
         f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
     if headers.get("x-tesserae-device-id-changed", "false") != "false":
       if "sleep_time" in self._data:
         del self._data["sleep_time"]
+      self._data["status"] = status.ERR_MAC
       raise RuntimeError(
         f"error: duplicate MAC for device_id: {self._data['device_id']}")
 
     if resp.get("registered",False):
+      self._data["status"] = status.REGISTERED
       self.msg(f"registered with token: {self._api.token}")
       self._data["token"] = self._api.token
       return 0
     else:
+      self._data["status"] = status.WAITING
       self.msg("waiting for admin registration")
       return resp.get("retry_after_s",30)
 
@@ -165,8 +170,10 @@ class DataProvider:
     code, headers, resp = self._api.register(pairing_code)
     if code != 201:
       # bail out
+      self._data["status"] = status.ERR_UNKNOWN
       raise RuntimeError(f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
     self._data["token"] = self._api.token
+    self._data["status"] = status.REGISTERED
     self.msg(
       f"registered with token: {self._api.token} (reused: {resp.reused_existing}"
     )
@@ -186,9 +193,9 @@ class DataProvider:
       self._create_api()
 
     # skip discovery/registration if we have a token
-    if not self._data["token"]:
-      if self._data["pairing_code"]:
-        self.register(self._data["pairing_code"])
+    if not data["token"]:
+      if data["pairing_code"]:
+        self.register(data["pairing_code"])
       else:
         wait_time = self.discover()
         if wait_time:
@@ -197,7 +204,6 @@ class DataProvider:
           return
 
     # at this point we should have a token (or the pairing code is invalid)
-    data["updated"] = False
     self._api.etag = data["etag"]
     start = time.monotonic()
     code, resp = self._api.frame()
@@ -207,14 +213,16 @@ class DataProvider:
       self.msg(resp)
 
     if code not in [200, 204, 304, 401, 403, 404]:
+      data["status"] = status.ERR_UNKNOWN
       raise RuntimeError(f"/frame: unexpected HTTP return code {code}")
 
     # if token is invalid, delete and restart
     if code in [401, 403, 404]:
       self.msg("invalid bearer token")
       self._api.token = None
-      self._data["token"] = None
+      data["token"] = None
       data["sleep_time"] = 1
+      data["status"] = status.INITIAL
 
     # save etag (will be persisted by the main application)
     if code == 200:
@@ -231,15 +239,21 @@ class DataProvider:
       try:
         self._create_bitmap(ext)
         if data["dl_mode"] != "FSCACHE":
-          data["updated"] = True
+          data["status"] = status.READY
+        else:
+          data["status"] = status.CACHED
       except Exception as ex:
         self.msg("failed to create bitmap from response")
         self.msg(f"  Exception: {ex}")
+        data["status"] = status.ERR_UNKNOWN
         raise
       finally:
         if response:
           response = None
       self.msg(f"fetch dashboard: {time.monotonic()-start:0.1f}s")
+    else:
+      # we either have a 204 or a 304 and don't update
+      data["status"] = status.IDLE
 
     # cleanup and log memory state
     gc.collect()
@@ -264,6 +278,7 @@ class DataProvider:
         if s_time and s_off:
           data["server_time"] = s_time + s_off
       else:
+        data["status"] = status.ERR_UNKNOWN
         raise RuntimeError(f"/status: unexpected HTTP return code {code}")
 
     return

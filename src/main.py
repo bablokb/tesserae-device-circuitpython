@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.8.0"
+FIRMWARE_VERSION= "0.9.0"
 
 # --- imports   --------------------------------------------------------------
 
@@ -19,6 +19,7 @@ import time
 import atexit
 import gc
 
+import status
 from settings import app_config
 from base_app.ui_application import UIApplication
 from tesserae_dataprovider import DataProvider
@@ -64,6 +65,7 @@ class App(UIApplication):
     # fill in attributes needed by data and ui-provider
     self.data.update({
       "fw_version":   FIRMWARE_VERSION,
+      "status":       status.INITIAL,
       "url":          app_config.url,
       "name":         getattr(app_config,"name", board.board_id),
       "device_id":    getattr(app_config,"device_id", self._get_id()),
@@ -133,6 +135,7 @@ class App(UIApplication):
       # use hard coded token
       self.msg(f"using hard-coded token: {app_config.token}")
       self.token = app_config.token
+      self.data["status"] = status.REGISTERED
     else:
       self.token = None
 
@@ -143,6 +146,7 @@ class App(UIApplication):
       # magic number does not match, invalidate token
       self.msg("magic number does not match, no data read")
       self._etag = None
+      self.data["status"] = status.INITIAL
       return
 
     # read token with given length
@@ -150,6 +154,7 @@ class App(UIApplication):
       # read token
       self.token = self.hal.nvram_read(3, buffer[2]).decode()
       self.msg(f"token read from NVRAM: {self.token}")
+      self.data["status"] = status.REGISTERED
     offset = 3 + buffer[2]
     len_etag = self.hal.nvram_read(offset, 1)[0]
     self.msg(f"{len_etag=}")

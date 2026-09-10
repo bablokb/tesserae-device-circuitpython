@@ -15,6 +15,7 @@ from adafruit_display_text import label
 
 from settings import app_config
 from ui_settings import UI_PALETTE, COLOR
+import status
 
 # --- main data-provider class   ---------------------------------------------
 
@@ -51,7 +52,7 @@ class UIProvider:
   def update_ui(self,data):
     """ update data: callback for Application """
 
-    if not data.get("updated",False):
+    if data["status"] != status.READY:
       return None
 
     if data["dl_mode"] == "PYGAME":
