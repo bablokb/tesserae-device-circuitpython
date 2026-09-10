@@ -43,6 +43,10 @@ class DataProvider:
       data.pop("dashboard")
       return
 
+    # read the requested sleep-time
+    with open(f'{filename}.txt','rt') as f:
+      data["sleep_time"] = int(f.readline())
+
     gc.collect()
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory before imageload: {gc.mem_free()}")

@@ -126,6 +126,13 @@ class App(UIApplication):
       now = time.localtime()
       self.msg("now:", now)
 
+    # in case we have downloaded a file to the FSCACHE, start the viewer
+    # The viewer will show the image and sleep as requested
+    if self.data["status"] == status.CACHED:
+      with open(f'{self.data["dl_fname"]}.txt','wt') as f:
+        f.write(f'{self.data["sleep_time"]}\n')
+      self.hal.start_code_file("image_viewer.py") # this exits this program!
+
   # --- read persisted data   ------------------------------------------------
 
   def _read_nvram(self):

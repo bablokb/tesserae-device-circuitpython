@@ -55,15 +55,6 @@ class App(UIApplication):
       "dashboard_filename": self._get_filename(),
       })
 
-  # --- override shutdown   --------------------------------------------------
-
-  def shutdown(self,with_wakeup):
-    """ instead of shutdown, reset """
-    delay = getattr(self.hal, "shutdown_delay", 0)
-    self.msg(f"resetting device after waiting {delay}s")
-    self.hal.sleep(delay)
-    self.hal.reset()
-
   # --- query filename of downloaded dashboard   -----------------------------
 
   def _get_filename(self):
@@ -98,7 +89,7 @@ data_provider = DataProvider()
 ui_provider = UIProvider()
 
 app = App(data_provider, ui_provider,
-          with_rtc=False, with_wifi=False)
+          with_rtc=True, with_wifi=False)
 atexit.register(at_exit,app)
 
 if getattr(app_config,"debug",False):

@@ -125,6 +125,7 @@ class DataProvider:
       self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
       dl_file.close()
       self.msg(f"downloaded file to {dl_fname}")
+      self._data["dl_fname"] = dl_fname
 
     # illegal mode
     else:
