@@ -44,6 +44,7 @@ msg() {
 setDefaults() {
   quiet=0; simulate=0; debug=0; verbose=0
   action="run"
+  py_file="./main.py"
 
   # default for client source-directory
   src="$(dirname "$0")/../src"
@@ -72,12 +73,14 @@ setDefaults() {
 # usage message   -------------------------------------------------------------
 
 usage() {
-  echo -e "\n`basename $0`: run Tesserae-Client\n\
+  echo -e "\n`basename $0`: run Tesserae-Client / Image-Viewer\n\
   \nusage: `basename $0` [options] display\n\
   possible options:\n\
     -V venv path to virtual environment\n\
     -S src  path to client soure-directory\n\
     -L      list predefined displays\n\
+
+    -i     run image-viewer instead of Tesserae-Client\n\
 
     -h     show this help\n\
     -q     run quiet\n\
@@ -90,20 +93,21 @@ usage() {
 # parse arguments and set variables -------------------------------------------
 
 parseArguments() {
-  while getopts ":V:S:Lhqvsd" opt; do
+  while getopts ":V:S:Lihqvsd" opt; do
     case $opt in
       V) venv=$(realpath -q "$OPTARG");;
       S) src=$(realpath -q "$OPTARG");;
       L) action="list_displays";;
-    h) usage
-       exit 0;;
-    q) quiet=1;;
-    v) verbose=1;;
-    s) simulate=1;;
-    d) debug=1;;
-    ?) echo "error: illegal option: $OPTARG" >&2
-       usage
-       exit 3;;
+      i) py_file="./image_viewer.py";;
+      h) usage
+         exit 0;;
+      q) quiet=1;;
+      v) verbose=1;;
+      s) simulate=1;;
+      d) debug=1;;
+      ?) echo "error: illegal option: $OPTARG" >&2
+         usage
+         exit 3;;
     esac
   done
   shift $((OPTIND-1))
@@ -173,5 +177,5 @@ else
   fi 
   export TESSERAE_DISPLAY="$display"
   cd "$src"
-  do_cmd "$venv/bin/python3" ./main.py
+  do_cmd "$venv/bin/python3" "$py_file"
 fi
