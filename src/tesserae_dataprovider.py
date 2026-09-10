@@ -69,7 +69,7 @@ class DataProvider:
 
   # --- create bitmap   ------------------------------------------------------
 
-  def _create_bitmap(self):
+  def _create_bitmap(self, file_ext):
     """ create a bitmap, palette """
 
     gc.collect()
@@ -117,7 +117,7 @@ class DataProvider:
 
     # download directly to a file
     elif dl_mode == "FSCACHE":
-      dl_fname = f"{self._data['dl_dir']}/dashboard.{self._data['format']}"
+      dl_fname = f"{self._data['dl_dir']}/dashboard.{file_ext}"
       dl_file = open(dl_fname,"wb")
       start = time.monotonic()
       self._api.url_content(io_obj=dl_file)
@@ -223,11 +223,13 @@ class DataProvider:
 
     # fetch dashboard data for HTTP200 and if requested
     if code == 200 or (code == 304 and data["304update"]):
+      # extract the file-extension in case _create_bitmap needs it
+      ext = resp["url"].split('?')[0].split('.')[-1]
       self.msg(f"fetching dashboard for HTTP-code {code}")
       start = time.monotonic()
       response = None
       try:
-        self._create_bitmap()
+        self._create_bitmap(ext)
         if data["dl_mode"] != "FSCACHE":
           data["updated"] = True
       except Exception as ex:
