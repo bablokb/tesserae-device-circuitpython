@@ -1,6 +1,14 @@
 # ----------------------------------------------------------------------------
 # hw_config_il0373.py: Settings for an IL0373 based display.
 #
+# Note that the specific display (Adafruit tri-color 1.54" 152x152)
+# does not need to cache images on a SD. But this example demonstrates
+# how to create and use a shared SPI-bus and to mount the SD.
+#
+# In case the mount fails (typically because of a missing SD) nothing
+# happens: the app might not use the SD after all. Depending on the
+# requirements, it might be better to re-raise the exception.
+#
 # Merge with your settings.py or copy to src/local, adapt as needed and use:
 #
 #    from local.hw_config_il0373 import hw_config
@@ -38,6 +46,7 @@ DC_PIN    = board.GP8
 RST_PIN   = board.GP15
 CS_PIN    = board.GP9
 BUSY_PIN  = board.GP13
+CS_SD_PIN = board.GP14
 
 # --- atexit processing   ----------------------------------------------------
 
@@ -45,16 +54,34 @@ def at_exit(spi):
   """ release spi """
   spi.deinit()
 
+# --- init-method   ----------------------------------------------------------
+
+def _init(hal):
+  """ initialize shared SPI here and mount /sd if possible """
+
+  displayio.release_displays()
+  hal.spi = busio.SPI(SCK_PIN,MOSI=MOSI_PIN,MISO=MISO_PIN)
+  atexit.register(at_exit,hal.spi)
+
+  try:
+    import sdcardio
+    import storage
+    sdcard = sdcardio.SDCard(hal.spi,CS_SD_PIN)
+    vfs    = storage.VfsFat(sdcard)
+    storage.mount(vfs, "/sd")
+    print("init(): /sd mounted successfully")
+  except Exception as ex:
+    print(f"init(): failed to mount /sd with exception: {ex}")
+
 # --- display-factory method   -----------------------------------------------
 
 def _get_display(hal):
-  """ create display with configured driver """
+  """ create display with configured driver.
+  This reuses the shared SPI created in init().
+  """
 
-  displayio.release_displays()
-  spi = busio.SPI(SCK_PIN,MOSI=MOSI_PIN,MISO=MISO_PIN)
-  atexit.register(at_exit,spi)
   display_bus = fourwire.FourWire(
-    spi, command=DC_PIN, chip_select=CS_PIN,
+    hal.spi, command=DC_PIN, chip_select=CS_PIN,
     reset=RST_PIN, baudrate=40_000_000
   )
   display = DRIVER(display_bus, width=WIDTH, height=HEIGHT,
@@ -67,6 +94,7 @@ class Settings:
   pass
 
 hw_config = Settings()
+hw_config.init = _init
 hw_config.get_display  = _get_display
 hw_config.gamut = "bwr_3"
 hw_config.eink  = True
