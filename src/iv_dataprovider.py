@@ -60,7 +60,7 @@ class DataProvider:
     else:
       import imageload
       data["dashboard"] = imageload.load(filename)
-      self.msg(f"pygame.image.load(): {time.monotonic()-start:0.1f}s")
+      self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
 
     gc.collect()
     if hasattr(gc,"mem_free"):
