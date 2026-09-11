@@ -130,7 +130,7 @@ class App(UIApplication):
     # The viewer will show the image and sleep as requested
     if self.data["status"] == status.CACHED:
       with open(f'{self.data["dl_fname"]}.txt','wt') as f:
-        f.write(f'{self.data["sleep_time"]}\n')
+        f.write(f'{self.data["sleep_time"]+int(time.time())}\n')
       self.hal.start_code_file("image_viewer.py") # this exits this program!
 
   # --- read persisted data   ------------------------------------------------
