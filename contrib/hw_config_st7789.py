@@ -1,6 +1,9 @@
 # ----------------------------------------------------------------------------
 # hw_config_st7789.py: Settings for a ST7789 based display.
 #
+# This specific example is for a "Waveshare Pico-ResTouch-LCD-2.8".
+# The device is very picky about the SD-card.
+#
 # Merge with your settings.py or copy to src/local, adapt as needed and use:
 #
 #    from local.hw_config_st7789 import hw_config
@@ -32,6 +35,7 @@ DC_PIN    = board.GP8
 RST_PIN   = board.GP15
 CS_PIN    = board.GP9
 BL_PIN    = board.GP13
+CS_SD_PIN = board.GP22
 
 # --- atexit processing   ----------------------------------------------------
 
@@ -39,16 +43,32 @@ def at_exit(spi):
   """ release spi """
   spi.deinit()
 
+# --- init-method   ----------------------------------------------------------
+
+def _init(hal):
+  """ initialize shared SPI here and mount /sd if possible """
+
+  displayio.release_displays()
+  hal.spi = busio.SPI(SCK_PIN,MOSI=MOSI_PIN,MISO=MISO_PIN)
+  atexit.register(at_exit,hal.spi)
+
+  try:
+    import sdcardio
+    import storage
+    sdcard = sdcardio.SDCard(hal.spi,CS_SD_PIN)
+    vfs    = storage.VfsFat(sdcard)
+    storage.mount(vfs, "/sd")
+    print("init(): /sd mounted successfully")
+  except Exception as ex:
+    print(f"init(): failed to mount /sd with exception: {ex}")
+
 # --- display-factory method   -----------------------------------------------
 
 def _get_display(hal):
   """ create display with configured driver """
 
-  displayio.release_displays()
-  spi = busio.SPI(SCK_PIN,MOSI=MOSI_PIN,MISO=MISO_PIN)
-  atexit.register(at_exit,spi)
   display_bus = fourwire.FourWire(
-    spi, command=DC_PIN, chip_select=CS_PIN,
+    hal.spi, command=DC_PIN, chip_select=CS_PIN,
     reset=RST_PIN, baudrate=40_000_000
   )
   display = DRIVER(display_bus, width=WIDTH, height=HEIGHT,
@@ -62,6 +82,7 @@ class Settings:
   pass
 
 hw_config = Settings()
+hw_config.init = _init
 hw_config.get_display  = _get_display
 hw_config.gamut = "rgb16"
 hw_config.eink  = False
