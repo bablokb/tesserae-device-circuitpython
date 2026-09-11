@@ -54,13 +54,20 @@ class DataProvider:
     # create PyGame surface if requested
     start = time.monotonic()
     if data.get("is_pygame", False):
+      self.msg("creating PyGame-surface from image file")
       import pygame
       data["dashboard"] = pygame.image.load(filename).convert()
       self.msg(f"pygame.image.load(): {time.monotonic()-start:0.1f}s")
     else:
-      import imageload
-      data["dashboard"] = imageload.load(filename)
-      self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
+      if gc.mem_free() > data["memory_requirement"]:
+        self.msg("creating Bitmap from image file")
+        import imageload
+        data["dashboard"] = imageload.load(filename)
+      else:
+        self.msg("creating OnDiskBitmap from image file")
+        import displayio
+        data["dashboard"] = displayio.OnDiskBitmap(filename)
+    self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
 
     gc.collect()
     if hasattr(gc,"mem_free"):

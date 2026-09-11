@@ -53,6 +53,7 @@ class App(UIApplication):
     self.data.update({
       "is_pygame":          self.is_pygame,
       "dashboard_filename": self._get_filename(),
+      "memory_requirement": self._get_memory(),
       })
 
   # --- query filename of downloaded dashboard   -----------------------------
@@ -78,6 +79,25 @@ class App(UIApplication):
     except OSError:
       raise ValueError(
         f"error: Invalid dl_dir configuration. {dl_dir} does not exist")
+
+  # --- estimate memory requirement   ----------------------------------------
+
+  def _get_memory(self):
+    """ estimate memory requirement from display attributes """
+
+    if self.hal.gamut == "mono":
+      bpp = 1
+    elif self.hal.gamut in ["gray_4", "bwr_3", "bwy_3"]:
+      bpp = 2
+    elif self.hal.gamut in ["spectra_6", "acep_7colour"]:
+      bpp = 4
+    elif self.hal.gamut == "rgb16":
+      bpp = 16
+    else:
+      bpp = 24
+    mr = int(self.display.width*self.display.height/(8/bpp))
+    self.msg(f"estimated memory for in memory Bitmap-object: {int(mr/1024)}k")
+    return mr
 
 # --- main program   ---------------------------------------------------------
 

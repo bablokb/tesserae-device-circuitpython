@@ -57,6 +57,12 @@ class UIProvider:
     dashboard = data["dashboard"]
     if isinstance(dashboard, tuple):
       bitmap, ps = dashboard
+    elif isinstance(dashboard, displayio.OnDiskBitmap):
+      bitmap, ps = dashboard, dashboard.pixel_shader
+    else:
+      ps = None
+
+    if ps:
       if len(self._view):
         self._view[0].bitmap = bitmap      # replace existing bitmap
         gc.collect()
