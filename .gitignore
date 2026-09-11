@@ -5,6 +5,7 @@ src/lib/adafruit*
 src/local
 *secrets.py
 settings.py
+settings.toml
 __pycache__
 venv*
 .venv*
