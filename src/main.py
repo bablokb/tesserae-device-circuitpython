@@ -77,10 +77,12 @@ class App(UIApplication):
       "format":       getattr(app_config,"format", "bmp"),
       "gamut":        self.hal.gamut,
       "eink":         self.hal.eink,
-      "dashboard":    self._alloc_bitmap(),
       "dl_mode":      self._get_dl_mode(),
       "dl_dir":       self._get_dl_dir(),
       })
+
+    if self.data["dl_mode"] != "FSCACHE":
+      self.data["dashboard"] = self._alloc_bitmap()
 
     # This is POR, so read data ...
     self._read_nvram()
