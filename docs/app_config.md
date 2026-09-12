@@ -109,13 +109,14 @@ Supported values:
   - `AUTO`: select a suitable mode automatically
   - `STREAM`: create `Bitmap`-object reading directly from the socket
   - `RAM`: buffer the image locally in RAM (using a `BytesIO`-object)
-  - `FSCACHE`: download the image to flash
+  - `FSCACHE`: download the image to SD or flash storage
   - `PYGAME`: directly create a PyGame surface
 
 Illegal values (e.g. `STREAM` together with format "png") are silently
 replaced with `AUTO`.
 
-Note: `FSCACHE` is not implemented yet.
+See [Low Memory Systems (SD caching)](./configuration.md#low-memory-systems)
+for details on how to use `dl_mode="FSCACHE"`.
 
 
 dl_dir
@@ -127,7 +128,8 @@ download directory must exist and must be mounted writable. The last
 option `dl_dir="/"` requires a CircuitPython version of at least
 10.3.0.
 
-Note: not implemented yet.
+See [Low Memory Systems (SD caching)](./configuration.md#low-memory-systems)
+for details on how to configure this feature.
 
 
 token
