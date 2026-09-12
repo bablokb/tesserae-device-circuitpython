@@ -46,6 +46,15 @@ See the examples below and the files in the [contrib
 directory](../contrib/Readme.md).
 
 
+Examples
+========
+
+  - [Minimal Example](#minimal-example)
+  - [Template Example](#template-example)
+  - [External Display](#mcu-with-an-external-busdisplay)
+  - [Low Memory Systems (SD caching)](#low-memory-systems)
+
+
 Minimal Example
 ---------------
 
@@ -157,3 +166,75 @@ for a variant for the Adafruit Sharp-Display.
     hw_config.get_display  = _get_display
     hw_config.gamut = "rgb16"
     hw_config.eink  = False
+
+
+Low Memory Systems
+------------------
+
+If the MCU does not have enough memory to hold the complete bitmap of
+the dashboard in memory, caching it in the filesystem is an option.
+Examples in the wild are usually a Pico-W combined with a large
+display, e.g. the first generation Pimoroni Inky-Frame series.
+
+The workflow changes from *wakeup->fetch->display->sleep->reset* to
+*wakeup->fetch->save->start viewer->display->sleep->reset*. The image
+viewer is a seperate program that does not initialize and use wifi and
+therefore provides more memory for the display task.
+
+Since the main filesystem of CircuitPython is normally not writable,
+this typically needs an available SD-breakout for the file cache (but
+see below for alternatives).
+
+To configure the system for caching, do the following:
+
+  1. Remove all wifi credentials (if any) from your `settings.toml`
+     on the device. This will prevent that the system loads the wifi-stack.
+  2. Add `CIRCUITPY_SDCARD_USB = false` to your `settings.toml`. This
+     will prevent that the mounted SD card is presented to the host.
+     Otherwise, the host will flood the device with USB-traffic for
+     about 30 seconds.
+  3. Add an `_init(hal)` method to your hardware configuration:
+
+         def _init(hal):
+            ...
+         ...
+         hw_config.init = _init
+
+     Within `init()`, mount the SD-card. For boilerplate code, see the
+     [IL0373 example](../contrib/hw_config_il0373.py) for a SD on a
+     shared SPI bus and the [UC8179 example](../contrib/hw_config_uc8179.py)
+     for a SD on a dedicated SPI bus.
+  4. Add the following options to your application configuration:
+
+         app_config.dl_mode = "FSCACHE"
+         app_config.dl_dir  = "/sd"
+
+
+Alternatives to the SD-Cache
+----------------------------
+
+There are two alternatives to the SD-cache that use normal internal flash:
+either cache to a `/saves`-partition or cache to the root filesystem `/`.
+
+The `/saves`-partition is part of the flash and created at *compile
+time*. It is usually not available in stock CircuitPython firmware. To
+use a `/saves`-partition, a custom build of CircuitPython is
+necessary. An advantage of this partition is that it does not need to
+be mounted and it is save to write to it. Without the option in (1)
+above, it is also exposed read-only to the host.
+
+Since the root-filesystem of the device is writable by the host, it is
+normally not writable by a CircuitPython program.  Starting from CP
+10.3.0, this can be changed with the following code fragment from
+within `_init()` instead of mounting the SD-card:
+
+    import storage
+    storage.unsafe_disable_usb_drive()
+
+To prevent filesystem corruption, make sure the CIRCUITPY-drive is not
+mounted on the host. On Linux and macOS, deactivate automounting and
+use a mount-copy-umount workflow to update program files. On Windows,
+eject the CIRCUITPY-device after updating files.
+
+Note that both alternatives might not work on the Pico-W, since the
+free space in flash is also limited (about 200K free).
