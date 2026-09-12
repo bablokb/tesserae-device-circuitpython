@@ -42,12 +42,12 @@ Status
 
 This list is not a priority list.
 
-  - [ ] Support memory constrained systems by caching files on SD
-  - [ ] Add example configurations for more hardware devices
   - [ ] Support buttons
   - [ ] Automated setup of PiOS based clients (using cloud-init)
   - [ ] Support touch displays
   - [ ] Automatically choose format (BMP or PNG) based on free memory
+  - [ ] Add example configurations for more hardware devices
+  - [X] Support memory constrained systems by caching files on SD
   - [X] Support PNG for systems with enough memory
   - [X] Improve documentation
   - [X] Client side scheduled wakeup and polling
@@ -87,6 +87,7 @@ Tested Devices
 Successfully tested:
 
   - **[SB-Components Enk-Pi](https://shop.sb-components.co.uk/products/enkpi)**
+  - **Pico-W with Waveshare Pico-ResTouch-LCD-2.8" (320x280)**
   - **Pico-W with Adafruit legacy 1.54" tri-color e-ink (152x152)**
   - **Pico-W with SharpMemory-Display (420x200)**
   - **Inky-Impression 7.3** (Spectra6) with Pico2-W (with adapter)
