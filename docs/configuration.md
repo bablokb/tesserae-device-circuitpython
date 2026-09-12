@@ -207,7 +207,8 @@ To configure the system for caching, do the following:
 
      Within `init()`, mount the SD-card. For boilerplate code, see the
      [IL0373 example](../contrib/hw_config_il0373.py) for a SD on a
-     shared SPI bus and the [UC8179 example](../contrib/hw_config_uc8179.py)
+     shared SPI bus and the
+     [UC8179 example](../contrib/hw_config_uc8179_tricolor.py)
      for a SD on a dedicated SPI bus.
   4. Add the following options to your application configuration:
 
