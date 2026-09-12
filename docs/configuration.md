@@ -181,6 +181,11 @@ The workflow changes from *wakeup->fetch->display->sleep->reset* to
 viewer is a seperate program that does not initialize and use wifi and
 therefore provides more memory for the display task.
 
+Implementation note: if the dashboard is too large even in viewer-mode,
+the update falls back to using `OnDiskBitmap`. This is very slow
+(e.g. Pico-W with 320x280 LCD: 75s), but should work for any size
+of display.
+
 Since the main filesystem of CircuitPython is normally not writable,
 this typically needs an available SD-breakout for the file cache (but
 see below for alternatives).
