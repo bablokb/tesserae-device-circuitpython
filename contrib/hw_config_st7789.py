@@ -52,6 +52,11 @@ def _init(hal):
   hal.spi = busio.SPI(SCK_PIN,MOSI=MOSI_PIN,MISO=MISO_PIN)
   atexit.register(at_exit,hal.spi)
 
+  # use for dl_dir="/"
+  #import storage
+  #storage.unsafe_disable_usb_drive()
+
+  # use for dl_dir="/sd"
   try:
     import sdcardio
     import storage
