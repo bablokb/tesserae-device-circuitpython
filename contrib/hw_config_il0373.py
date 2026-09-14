@@ -46,7 +46,7 @@ DC_PIN    = board.GP8
 RST_PIN   = board.GP15
 CS_PIN    = board.GP9
 BUSY_PIN  = board.GP13
-CS_SD_PIN = board.GP14
+SD_CS_PIN = board.GP14
 
 # --- atexit processing   ----------------------------------------------------
 
@@ -60,17 +60,19 @@ def _init(hal):
   """ initialize shared SPI here and mount /sd if possible """
 
   displayio.release_displays()
+  # save reference to spi within hal for later use in _display
   hal.spi = busio.SPI(SCK_PIN,MOSI=MOSI_PIN,MISO=MISO_PIN)
   atexit.register(at_exit,hal.spi)
 
   try:
     import sdcardio
     import storage
-    sdcard = sdcardio.SDCard(hal.spi,CS_SD_PIN)
+    sdcard = sdcardio.SDCard(hal.spi,SD_CS_PIN)
     vfs    = storage.VfsFat(sdcard)
     storage.mount(vfs, "/sd")
     print("init(): /sd mounted successfully")
   except Exception as ex:
+    # for this device the SD is optional, don't bail out
     print(f"init(): failed to mount /sd with exception: {ex}")
 
 # --- display-factory method   -----------------------------------------------
