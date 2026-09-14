@@ -351,6 +351,11 @@ class App(UIApplication):
 
 # --- main program   ---------------------------------------------------------
 
+if hasattr(gc,"mem_free"):
+  mem_free_start = f"{int(gc.mem_free()/1024)}k"
+else:
+  mem_free_start = "unknown"
+
 if getattr(app_config,"debug",False):
   wait_for_console()
 
@@ -360,9 +365,8 @@ ui_provider = UIProvider()
 
 app = App(data_provider,ui_provider)
 atexit.register(at_exit,app)
-
-if getattr(app_config,"debug",False):
-  app.msg(f"startup: {time.monotonic()-start:f}s")
+app.msg(f"startup duration: {time.monotonic()-start:f}s")
+app.msg(f"startup free-mem: {mem_free_start}")
 
 if getattr(app_config,"always_on",False):
   app.msg(f"runing endless")

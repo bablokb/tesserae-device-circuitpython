@@ -11,8 +11,9 @@
 
 # --- imports   --------------------------------------------------------------
 
-import time
 import atexit
+import gc
+import time
 
 from settings import app_config
 from base_app.ui_application import UIApplication
@@ -101,6 +102,11 @@ class App(UIApplication):
 
 # --- main program   ---------------------------------------------------------
 
+if hasattr(gc,"mem_free"):
+  mem_free_start = f"{int(gc.mem_free()/1024)}k"
+else:
+  mem_free_start = "unknown"
+
 if getattr(app_config,"debug",False):
   wait_for_console()
 
@@ -112,7 +118,6 @@ app = App(data_provider, ui_provider,
           with_rtc=True, with_wifi=False)
 atexit.register(at_exit,app)
 
-if getattr(app_config,"debug",False):
-  print(f"startup: {time.monotonic()-start:f}s")
-
+app.msg(f"startup duration: {time.monotonic()-start:f}s")
+app.msg(f"startup free-mem: {mem_free_start}")
 app.run_once()
