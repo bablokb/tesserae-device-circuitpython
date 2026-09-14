@@ -11,10 +11,13 @@
 # ----------------------------------------------------------------------------
 
 import atexit
+import board
 import busio
 import displayio
 import fourwire
-import board
+import sdcardio
+import storage
+
 from adafruit_uc8179 import UC8179
 
 # --- Hardware config for SB Components Enk-Pi
@@ -24,8 +27,8 @@ from adafruit_uc8179 import UC8179
 
 # --- basic display configuration   ----------
 
-WIDTH      = 600 # reduced resolution due to memory constraints
-HEIGHT     = 240
+WIDTH      = 800
+HEIGHT     = 480
 ROTATION   = 180
 DRIVER     = UC8179
 
@@ -38,11 +41,37 @@ RST_PIN   = board.GP12
 CS_PIN    = board.GP9
 BUSY_PIN  = board.GP13
 
+SD_SCK_PIN   = board.GP18
+SD_MOSI_PIN  = board.GP19
+SD_MISO_PIN  = board.GP16
+SD_CS_PIN    = board.GP17
+
 # --- atexit processing   --------------------
 
 def at_exit(spi):
   """ release spi """
   spi.deinit()
+
+# --- init-method   ----------------------------------------------------------
+
+def _init(hal):
+  """ initialize dedicated SPI here and mount /sd if possible """
+
+  hal = busio.SPI(SD_SCK_PIN,MOSI=SD_MOSI_PIN,MISO=SD_MISO_PIN)
+  atexit.register(at_exit,hal)
+
+  # use for dl_dir="/" (read the documentation before you use this!)
+  #storage.unsafe_disable_usb_drive()
+
+  # use for dl_dir="/sd"
+  try:
+    sdcard = sdcardio.SDCard(hal,SD_CS_PIN)
+    vfs    = storage.VfsFat(sdcard)
+    storage.mount(vfs, "/sd")
+    print("init(): /sd mounted successfully")
+  except Exception as ex:
+    print(f"init(): failed to mount /sd with exception: {ex}")
+    raise
 
 # --- display-factory method   ---------------
 
@@ -71,6 +100,11 @@ class Settings:
   pass
 
 hw_config = Settings()
+hw_config.init = _init
 hw_config.get_display  = _get_display
 hw_config.gamut = "bwr_3"
 hw_config.eink  = True
+# buttons are low on press, configure internal pullups
+hw_config.BUTTONS = ([board.GP2, board.GP3, board.GP4,
+                      board.GP5, board.GP14,board.GP15,
+                      ], False, True)
