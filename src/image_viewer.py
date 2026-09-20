@@ -97,7 +97,7 @@ class App(UIApplication):
     else:
       bpp = 24
     mr = int(self.display.width*self.display.height/(8/bpp))
-    self.msg(f"estimated memory for in memory Bitmap-object: {int(mr/1024)}k")
+    self.msg(f"estimated memory for in memory Bitmap-object: {mr}")
     return mr
 
 # --- main program   ---------------------------------------------------------
