@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.9.1"
+FIRMWARE_VERSION= "0.10.0"
 
 # --- imports   --------------------------------------------------------------
 
@@ -71,15 +71,12 @@ class App(UIApplication):
       "device_id":    getattr(app_config,"device_id", self._get_id()),
       "pairing_code": getattr(app_config,"pairing_code", None),
       "mac":          getattr(app_config,"mac", self.wifi.mac_address),
-      "width":        self.display.width,
-      "height":       self.display.height,
-      "rotation":     getattr(app_config,"rotation", 0),
-      "format":       getattr(app_config,"format", "bmp"),
-      "gamut":        self.hal.gamut,
-      "eink":         self.hal.eink,
       "dl_mode":      self._get_dl_mode(),
       "dl_dir":       self._get_dl_dir(),
       })
+
+    # width, height, rotation, ...
+    self._set_display_attr()
 
     if self.data["dl_mode"] != "FSCACHE":
       self.data["dashboard"] = self._alloc_bitmap()
@@ -218,6 +215,28 @@ class App(UIApplication):
       buffer[offset:offset+len(etag)] = etag
     self.msg(f"saving '{buffer}' to NVRAM")
     self.hal.nvram_write(0, buffer)
+
+  # --- set display attributes depending on download-mode and rotation   -----
+
+  def _set_display_attr(self):
+    """ set display attributes """
+
+    # set display.rotation=0 to optimize OnDiskBitmap performance
+    rotation = getattr(app_config,"rotation", 0)
+    if self.display.rotation in [90, 270] and self.data["dl_mode"] == "FSCACHE":
+      board_rotation = display.rotation
+      self.display.rotation = 0
+      rotation = (board_rotation + rotation) % 360
+
+    # set the display attributes
+    self.data.update({
+      "width":        self.display.width,
+      "height":       self.display.height,
+      "rotation":     rotation,
+      "format":       getattr(app_config,"format", "bmp"),
+      "gamut":        self.hal.gamut,
+      "eink":         self.hal.eink,
+      }
 
   # --- allocate a bitmap for the display   ----------------------------------
 
