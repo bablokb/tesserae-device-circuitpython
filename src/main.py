@@ -221,12 +221,15 @@ class App(UIApplication):
       self.display.rotation = 0
       rotation = (board_rotation + rotation) % 360
 
+    # change format to BMP for FSCACHE
+    format = ("bmp" if self.data["dl_mode"] == "FSCACHE"
+              else getattr(app_config,"format", "bmp"))
     # set the display attributes
     self.data.update({
       "width":        self.display.width,
       "height":       self.display.height,
       "rotation":     rotation,
-      "format":       getattr(app_config,"format", "bmp"),
+      "format":       format,
       "gamut":        self.hal.gamut,
       "eink":         self.hal.eink,
       })
