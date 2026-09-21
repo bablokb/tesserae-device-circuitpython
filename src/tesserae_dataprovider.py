@@ -116,7 +116,7 @@ class DataProvider:
       self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
       io_obj.close()
 
-    # download directly to a file
+    # download directly to a file and create an OnDiskBitmap
     elif dl_mode == "FSCACHE":
       dl_fname = f"{self._data['dl_dir']}/dashboard.{file_ext}"
       dl_file = open(dl_fname,"wb")
@@ -125,7 +125,9 @@ class DataProvider:
       self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
       dl_file.close()
       self.msg(f"downloaded file to {dl_fname}")
-      self._data["dl_fname"] = dl_fname
+      self.msg("creating OnDiskBitmap from image file")
+      import displayio
+      self._data["dashboard"] = displayio.OnDiskBitmap(dl_fname)
 
     # illegal mode
     else:
@@ -239,10 +241,7 @@ class DataProvider:
       response = None
       try:
         self._create_bitmap(ext)
-        if data["dl_mode"] != "FSCACHE":
-          data["status"] = status.READY
-        else:
-          data["status"] = status.CACHED
+        data["status"] = status.READY
       except Exception as ex:
         self.msg("failed to create bitmap from response")
         self.msg(f"  Exception: {ex}")
