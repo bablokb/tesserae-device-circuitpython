@@ -87,18 +87,18 @@ Tested Devices
 Successfully tested:
 
   - **[SB-Components Enk-Pi](https://shop.sb-components.co.uk/products/enkpi)**
-  - **Pico-W with Waveshare Pico-ResTouch-LCD-2.8" (320x280)**
+  - **Pico-W with Waveshare Pico-ResTouch-LCD-2.8" (320x240)**
   - **Pico-W with Adafruit legacy 1.54" tri-color e-ink (152x152)**
   - **Pico-W with SharpMemory-Display (420x200)**
   - **Inky-Impression 7.3** (Spectra6) with Pico2-W (with adapter)
   - **Adafruit MagTag**
   - **Blinka with PyGame-Displayio** on Linux, Pi3, Pi5
   - **Blinka with PyGame-Displayio** on MacOS
+  - **Pimoroni Inky-Frame-5.7** (embedded Pico-W): works with caching on SD
 
 Failed devices:
 
-  - **Pimoroni Inky-Frame-5.7** (embedded Pico-W): MemoryError.
-    This device might work once caching on SD is implemented.
+  - currently none reported
 
 
 Installation
