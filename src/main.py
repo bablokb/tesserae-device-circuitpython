@@ -217,7 +217,7 @@ class App(UIApplication):
     # set display.rotation=0 to optimize OnDiskBitmap performance
     rotation = getattr(app_config,"rotation", 0)
     if self.display.rotation in [90, 270] and self.data["dl_mode"] == "FSCACHE":
-      board_rotation = display.rotation
+      board_rotation = self.display.rotation
       self.display.rotation = 0
       rotation = (board_rotation + rotation) % 360
 
