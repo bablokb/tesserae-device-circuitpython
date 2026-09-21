@@ -229,7 +229,7 @@ class App(UIApplication):
       "format":       getattr(app_config,"format", "bmp"),
       "gamut":        self.hal.gamut,
       "eink":         self.hal.eink,
-      }
+      })
 
   # --- allocate a bitmap for the display   ----------------------------------
 
