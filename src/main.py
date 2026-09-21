@@ -271,8 +271,11 @@ class App(UIApplication):
     # memory-config tokens: 4mbflash, 2mbpsram, nopsram, 16mb, n8r8, ...
     if tok == "nopsram":
       return True
-    if tok[0].isdigit() and tok.endswith(("mbflash", "mbpsram", "mb")):
-      return True
+    if tok[0].isdigit():
+      # CircuitPython does not allow a tuple in str.endswith()
+      for suffix in ("mbflash", "mbpsram", "mb"):
+        if tok.endswith(suffix):
+          return True
     if (len(tok) >= 4 and tok[0] == "n" and "r" in tok
         and tok[1:].replace("r", "").isdigit()):
       return True
