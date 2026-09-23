@@ -74,11 +74,15 @@ pixels and is driven by an embedded Pico-W. This combination cannot
 download the dashboard and update the display in one go. The second
 generation Inky-Frame 7.3 with a Pico2-W in contrast does work.
 
+Memory constrained systems need to download the dashboard to a
+filesystem cache before updating the display. Currently, an external
+SD card is the only recommended option.
+
 Another aspect is support for deep-sleep. While the Inky-Frames
 support very low power states due to special hardware, other
-RP2xxx-devices use much more energy compared to ESP32xx
-systems. Mainline CircuitPython doesn't even have support for
-RP2350 deep-sleep at all.
+RP2xxx-devices use much more energy compared to ESP32xx systems. For
+RP2350 systems, mainline CircuitPython adds deep-sleep support
+starting with the upcoming version 10.4.0.
 
 
 Tested Devices
