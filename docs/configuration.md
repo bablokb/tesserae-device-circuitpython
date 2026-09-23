@@ -244,11 +244,14 @@ eject the CIRCUITPY-device after updating files.
 
 **Big fat warning**: If something goes wrong, you might be left with a
 system that you cannot update. Therefore **it is not recommended that
-you use this feature** unless you really know what you are doing. In case
-your system is bricked, you should download a "nuke"-uf2 (e.g. from
+you use this feature** unless you really know what you are doing. In
+case your system is bricked, you should download a "nuke"-uf2
+(e.g. from
 <https://github.com/Gadgetoid/pico-universal-flash-nuke/releases/tag/v1.1.0>),
- "install" it on the device and then start from the beginning
- (i.e. with the installation of CircuitPython).
+"install" it on the device and then start from the beginning, i.e.
+with the installation of CircuitPython.
+
+**This feature is available, but broken in CP 10.3.0, so don't use it**.
 
 Note that both alternatives might not work on the Pico-W, since the
 free space in flash is also limited (about 200K free).
