@@ -23,7 +23,7 @@ create_sys_user() {
     groupadd -r $SYS_USER
     adduser --gecos "" --system --group \
                               --home "$SYS_USER_HOME" $SYS_USER
-    usermod -a -G render,video $SYS_USER
+    usermod -a -G gpio,render,video $SYS_USER
   fi
 }
 
