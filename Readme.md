@@ -47,6 +47,7 @@ This list is not a priority list.
   - [ ] Support touch displays
   - [ ] Automatically choose format (BMP or PNG) based on free memory
   - [ ] Add example configurations for more hardware devices
+  - [X] Show messages during registration
   - [X] Support memory constrained systems by caching files on SD
   - [X] Support PNG for systems with enough memory
   - [X] Improve documentation
