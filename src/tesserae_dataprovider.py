@@ -119,15 +119,30 @@ class DataProvider:
     # download directly to a file and create an OnDiskBitmap
     elif dl_mode == "FSCACHE":
       dl_fname = f"{self._data['dl_dir']}/dashboard.{file_ext}"
-      dl_file = open(dl_fname,"wb")
-      start = time.monotonic()
-      self._api.url_content(io_obj=dl_file)
-      self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
-      dl_file.close()
-      self.msg(f"downloaded file to {dl_fname}")
-      self.msg("creating OnDiskBitmap from image file")
-      import displayio
-      self._data["dashboard"] = displayio.OnDiskBitmap(dl_fname)
+      dl_file = None
+
+      for attempt in range(Tesserae_API.RETRIES):
+        try:
+          dl_file = open(dl_fname,"wb")
+          start = time.monotonic()
+          self._api.url_content(io_obj=dl_file)
+          self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
+          self.msg(f"downloaded file to {dl_fname}")
+          dl_file.close()
+          self.msg("creating OnDiskBitmap from image file")
+          import displayio
+          self._data["dashboard"] = displayio.OnDiskBitmap(dl_fname)
+          break
+        except Exception as ex:
+          self.msg(f"download failed with exception: {ex}")
+          if attempt == Tesserae_API.RETRIES-1:
+            raise
+        finally:
+          try:
+            if dl_file:
+              dl_file.close()
+          except:
+            pass
 
     # illegal mode
     else:
@@ -251,9 +266,10 @@ class DataProvider:
         if response:
           response = None
       self.msg(f"fetch dashboard: {time.monotonic()-start:0.1f}s")
-    else:
-      # we either have a 204 or a 304 and don't update
-      data["status"] = status.IDLE
+    elif code == 204:
+      data["status"] = status.NO_PUSH
+    elif code == 304:
+      data["status"] = status.NO_UPDATE
 
     # cleanup and log memory state
     gc.collect()
