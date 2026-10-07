@@ -49,6 +49,13 @@ process, run
 
 if you only want to update the client code.
 
+**Note**: the installation will create the file
+`/etc/tesserae-device-circuitpython/settings.py` if it does not exist
+yet from `src/settings_template.py`. If the settings-file exists
+already, it will create the file
+`/etc/tesserae-device-circuitpython/settings.py.new` instead. **Be
+sure to pick up changes in case of upgrading**.
+
 
 Uing Read-Only Mode
 -------------------

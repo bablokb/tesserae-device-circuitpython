@@ -34,7 +34,8 @@ MCU Installation
          cd tesserae-device-circuitpython
 
   3. Copy `src/settings_template.py` to `src/settings.py` and adapt to
-     your needs. Make sure to read the [configuration
+     your needs.  **Be sure to pick up changes to the template in case
+     of upgrading**. Also read the [configuration
      guide](./docs/configuration.md).
 
   4. Copy the *content* of the `src/`-directory to your device. Don't

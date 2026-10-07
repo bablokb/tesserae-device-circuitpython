@@ -28,7 +28,8 @@ Configuration and Running
 
 The central configuration file is `src/settings.py` which is not
 tracked by the repository. Copy the blueprint `src/settings_template.py`
-to `src/settings.py` and edit where appropriate.
+to `src/settings.py` and edit where appropriate. **Be sure to pick up
+changes to the template in case of upgrading**.
 
 Read the [configuration guide](./docs/configuration.md) for all the
 details.
