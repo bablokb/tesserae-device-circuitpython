@@ -80,10 +80,10 @@ class DataProvider:
     # reuse existing bitmap if available
     dl_mode = self._data["dl_mode"]
     if not dl_mode == "PYGAME":
-      if "dashboard" in self._data:
-        bitmap = self._data["dashboard"][0]
-      else:
-        bitmap = None
+      # only the (bitmap,palette)-tuple can be reused. FSCACHE stores an
+      # OnDiskBitmap here, which is not subscriptable.
+      dashboard = self._data.get("dashboard", None)
+      bitmap = dashboard[0] if isinstance(dashboard, tuple) else None
 
     # download to RAM or surface if required
     if dl_mode in ["PYGAME", "RAM"]:
@@ -242,10 +242,11 @@ class DataProvider:
       data["sleep_time"] = 1
       data["status"] = status.INITIAL
 
-    # save etag (will be persisted by the main application)
+    # stage the etag. It is promoted to data["etag"] by run_end(), i.e.
+    # only after the frame has actually been painted.
     if code == 200:
       self.msg(f"new etag: {self._api.etag}")
-      data["etag"] = self._api.etag
+      data["etag_pending"] = self._api.etag
 
     # fetch dashboard data for HTTP200 and if requested
     if code == 200 or (code == 304 and data["304update"]):

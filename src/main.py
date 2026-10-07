@@ -110,6 +110,11 @@ class App(UIApplication):
   def run_end(self):
     """ Hook to execute at end of run(): save token """
 
+    # promote a staged etag: we only get here if update_display() returned,
+    # so the frame this etag refers to has actually been painted.
+    if self.data.get("etag_pending", None):
+      self.data["etag"] = self.data.pop("etag_pending")
+
     # update data in NVRAM and attributes in self
     self._write_nvram()
 
