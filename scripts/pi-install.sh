@@ -97,6 +97,11 @@ install_client() {
          "$CONFIG/settings.py"
     ln -s "$CONFIG/settings.py" \
                "$SYS_USER_HOME/$PROJECT/src/settings.py"
+  else
+    echo -e "[INFO] creating $CONFIG/settings.py.new" 2>&1
+    cp \
+      "$SYS_USER_HOME/$PROJECT/src/settings_template.py" \
+         "$CONFIG/settings.py.new"
   fi
 }
 
