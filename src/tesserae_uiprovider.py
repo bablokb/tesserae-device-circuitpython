@@ -99,10 +99,10 @@ class UIProvider:
     self._view = None
     gc.collect()
 
-  # --- show message to the user   -------------------------------------------
+  # --- get message for the user   -------------------------------------------
 
-  def show_message(self, status):
-    """ update display with message """
+  def create_message(self, status):
+    """ create message label """
 
     import locale, builtins
     lang = locale.getlocale()[0]
@@ -121,22 +121,30 @@ class UIProvider:
       msg_text = f"unsupported status '{status}' for language '{lang}'"
 
     scale = 2 if self._display.width > 479 else 1
-    msg_label = label.Label(
+    return label.Label(
       terminalio.FONT,
       text=msg_text,
       color=UI_PALETTE[COLOR.WHITE],
       line_spacing=1.2,
       scale=scale,
-      anchor_point=(0.5,0.5),
-      anchored_position=(self._display.width//2, self._display.height//2)
       )
+
+  # --- show message to the user   -------------------------------------------
+
+  def show_message(self, status):
+    """ update display with message """
+
+    msg_label = self.create_message(status)
+    msg_label.anchor_point=(0.5,0.5),
+    msg_label.anchored_position=(
+      self._display.width//2, self._display.height//2)
     g = displayio.Group()
-    g.append(msg_label)
+    g.append()
     return g
     
   # --- handle exception   ---------------------------------------------------
 
-  def handle_exception(self,ex):
+  def handle_exception(self, ex, data):
     """ handle exception """
 
     import traceback
@@ -163,6 +171,11 @@ class UIProvider:
                             anchor_point=(0,0),
                             anchored_position=(0,0))
 
+    msg_label = self.create_message(data["status"])
+    msg_label.anchor_point=(0.5,1.0)
+    msg_label.anchored_position=(
+      self._display.width//2, self._display.height-5)
     g = displayio.Group()
     g.append(error_txt)
+    g.append(msg_label)
     return g
