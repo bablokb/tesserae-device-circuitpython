@@ -61,6 +61,9 @@ class UIProvider:
     if data["status"] == status.NO_UPDATE:
       self.msg("no display update (status: no update)")
       return None
+    if data["status"] == status.INITIAL:
+      self.msg("no display update (status: initial)")
+      return None
     if data["status"] != status.READY:
       self.msg("show user message (status: not ready)")
       return self.show_message(data["status"])

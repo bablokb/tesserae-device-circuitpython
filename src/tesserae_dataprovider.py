@@ -252,6 +252,17 @@ class DataProvider:
     if code == 200 or (code == 304 and data["304update"]):
       # extract the file-extension in case _create_bitmap needs it
       ext = resp["url"].split('?')[0].split('.')[-1]
+
+      # check if extension is bmp if FSCACHE is set. Otherwise,
+      # force re-registration
+      if self._data["dl_mode"] == "FSCACHE" and ext != "bmp":
+        self.msg("FSCACHE needs bmp, not png. Forcing new registration")
+        self._api.token = None
+        data["token"] = None
+        data["sleep_time"] = 1
+        data["status"] = status.INITIAL
+        return
+
       self.msg(f"fetching dashboard for HTTP-code {code}")
       start = time.monotonic()
       response = None
