@@ -261,12 +261,13 @@ class App(UIApplication):
     gc.collect()
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory before Bitmap allocation: {gc.mem_free()}")
-    return (Bitmap(self.display.width,
-                             self.display.height,
-                             col_map[self.hal.gamut]),
-            None)
+    bitmap = (Bitmap(self.display.width,
+                     self.display.height,
+                     col_map[self.hal.gamut]),
+              None)
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory after Bitmap allocation: {gc.mem_free()}")
+    return bitmap
 
   # --- helper for _sanitize   -----------------------------------------------
 
