@@ -177,14 +177,10 @@ Examples in the wild are usually a Pico-W combined with a large
 display, e.g. the first generation Pimoroni Inky-Frame series.
 
 The workflow changes from *wakeup->fetch->display->sleep->reset* to
-*wakeup->fetch->save->start viewer->display->sleep->reset*. The image
-viewer is a seperate program that does not initialize and use wifi and
-therefore provides more memory for the display task.
-
-Implementation note: if the dashboard is too large even in viewer-mode,
-the update falls back to using `OnDiskBitmap`. This is very slow
-(e.g. Pico-W with 320x280 LCD: 75s), but should work for any size
-of display.
+*wakeup->fetch->save->load-and-display on-the-fly->sleep->reset*. It
+uses `OnDiskBitmap` for loading the image on-the-fly. This is slower
+than loading the bitmap into RAM, but with a number of internal tweaks
+the update time is acceptable.
 
 Since the main filesystem of CircuitPython is normally not writable,
 this typically needs an available SD-breakout for the file cache (but
@@ -226,7 +222,7 @@ The `/saves`-partition is part of the flash and created at *compile
 time*. It is usually not available in stock CircuitPython firmware. To
 use a `/saves`-partition, a custom build of CircuitPython is
 necessary. An advantage of this partition is that it does not need to
-be mounted and it is save to write to it. Without the option in (1)
+be mounted and it is safe to write to it. Without the option in (1)
 above, it is also exposed read-only to the host.
 
 Since the root-filesystem of the device is writable by the host, it is
