@@ -224,7 +224,11 @@ class DataProvider:
     # at this point we should have a token (or the pairing code is invalid)
     self._api.etag = data["etag"]
     start = time.monotonic()
-    code, resp = self._api.frame()
+    try:
+      code, resp = self._api.frame()
+    except Exception as ex:
+      data["status"] = status.ERR_NET
+      raise
     self.msg(f"/frame: {time.monotonic()-start:0.1f}s")
     self.msg(f"api.frame(): HTTP-code: {code}")
     if resp:
