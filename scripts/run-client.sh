@@ -73,14 +73,12 @@ setDefaults() {
 # usage message   -------------------------------------------------------------
 
 usage() {
-  echo -e "\n`basename $0`: run Tesserae-Client / Image-Viewer\n\
+  echo -e "\n`basename $0`: run Tesserae-Client\n\
   \nusage: `basename $0` [options] display\n\
   possible options:\n\
     -V venv path to virtual environment\n\
     -S src  path to client soure-directory\n\
     -L      list predefined displays\n\
-
-    -i     run image-viewer instead of Tesserae-Client\n\
 
     -h     show this help\n\
     -q     run quiet\n\
@@ -93,12 +91,11 @@ usage() {
 # parse arguments and set variables -------------------------------------------
 
 parseArguments() {
-  while getopts ":V:S:Lihqvsd" opt; do
+  while getopts ":V:S:Lhqvsd" opt; do
     case $opt in
       V) venv=$(realpath -q "$OPTARG");;
       S) src=$(realpath -q "$OPTARG");;
       L) action="list_displays";;
-      i) py_file="./image_viewer.py";;
       h) usage
          exit 0;;
       q) quiet=1;;
