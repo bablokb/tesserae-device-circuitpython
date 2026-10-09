@@ -135,11 +135,11 @@ class UIProvider:
     """ update display with message """
 
     msg_label = self.create_message(status)
-    msg_label.anchor_point=(0.5,0.5),
+    msg_label.anchor_point=(0.5,0.5)
     msg_label.anchored_position=(
       self._display.width//2, self._display.height//2)
     g = displayio.Group()
-    g.append()
+    g.append(msg_label)
     return g
     
   # --- handle exception   ---------------------------------------------------
