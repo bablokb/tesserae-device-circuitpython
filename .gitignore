@@ -1,4 +1,5 @@
 work
+*.local
 *.pyc
 TODO
 src/lib/adafruit*
