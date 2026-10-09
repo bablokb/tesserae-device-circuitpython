@@ -66,7 +66,10 @@ class UIProvider:
       return None
     if data["status"] != status.READY:
       self.msg("show user message (status: not ready)")
-      return self.show_message(data["status"])
+      return self.show_message(data)
+
+    # update display rotation (dashboard is rotated server-side)
+    self._display.rotation = 0
 
     self.msg("processing dashboard:")
     dashboard = data["dashboard"]
@@ -86,6 +89,7 @@ class UIProvider:
       gc.collect()
     else:
       self._view.append(displayio.TileGrid(bitmap, pixel_shader=ps))
+
     return self._view
 
   # --- clear UI and free memory   -------------------------------------------
@@ -131,9 +135,13 @@ class UIProvider:
 
   # --- show message to the user   -------------------------------------------
 
-  def show_message(self, status):
+  def show_message(self, data):
     """ update display with message """
 
+    # update display rotation (locally created, so no server-side rotation)
+    self._display.rotation = data["board_rotation"]
+
+    status = data["status"]
     msg_label = self.create_message(status)
     msg_label.anchor_point=(0.5,0.5)
     msg_label.anchored_position=(
@@ -163,6 +171,9 @@ class UIProvider:
     # and update display
     if not self._display:
       return
+
+    # update display rotation (locally created, so no server-side rotation)
+    self._display.rotation = data["board_rotation"]
 
     error_txt = label.Label(terminalio.FONT,
                             text=ex_txt,

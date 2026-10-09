@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.11.1"
+FIRMWARE_VERSION= "0.11.2"
 
 # --- imports   --------------------------------------------------------------
 
@@ -221,9 +221,8 @@ class App(UIApplication):
 
     # set display.rotation=0 to optimize OnDiskBitmap performance
     rotation = getattr(app_config,"rotation", 0)
-    if self.display.rotation in [90, 270] and self.data["dl_mode"] == "FSCACHE":
-      board_rotation = self.display.rotation
-      self.display.rotation = 0
+    board_rotation = self.display.rotation
+    if board_rotation in [90, 270] and self.data["dl_mode"] == "FSCACHE":
       rotation = (board_rotation + rotation) % 360
 
     # change format to BMP for FSCACHE
@@ -231,12 +230,13 @@ class App(UIApplication):
               else getattr(app_config,"format", "bmp"))
     # set the display attributes
     self.data.update({
-      "width":        self.display.width,
-      "height":       self.display.height,
-      "rotation":     rotation,
-      "format":       format,
-      "gamut":        self.hal.gamut,
-      "eink":         self.hal.eink,
+      "width":          self.display.width,
+      "height":         self.display.height,
+      "rotation":       rotation,
+      "board_rotation": board_rotation,   # the original rotation
+      "format":         format,
+      "gamut":          self.hal.gamut,
+      "eink":           self.hal.eink,
       })
 
   # --- allocate a bitmap for the display   ----------------------------------
