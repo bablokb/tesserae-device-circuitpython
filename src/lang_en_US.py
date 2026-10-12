@@ -1,8 +1,6 @@
 # ----------------------------------------------------------------------------
 # Message translations for en_US.
 #
-# Note: currently lang_en_UK.py is linked to this file.
-#
 # Author: Bernhard Bablok
 # License: GPL3
 #
