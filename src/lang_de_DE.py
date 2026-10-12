@@ -13,6 +13,6 @@ MSG_TABLE = {
   status.WAITING     : "Warte auf Registrierung durch Admin",
   status.NO_PUSH     : "Noch kein Dashboard verfügbar",
   status.ERR_MAC     : "Doppelte MAC-Adresse, Admin-Aktion notwendig",
-  status.ERR_NET     : "Netzwerkfehler (ev. vorrübergehend)",
+  status.ERR_NET     : "Netzwerkfehler (ev. vorübergehend)",
   status.ERR_UNKNOWN : "Unbekannter Fehler",
   }
