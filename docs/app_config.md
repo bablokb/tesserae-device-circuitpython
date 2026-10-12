@@ -38,6 +38,7 @@ settings, see the sections below.
 | app_name       | str     | no³   |        | Local application name      |
 | run_interval   | int     | no    | 60     | Fallback interval           | 
 | time_table     | list    | no    |        | Local scheduling            |
+| lang           | str     | no    |        | Language code for messages  |
 
 ¹ Legacy only - don't use for new configurations
 ² The name defaults to `board.board_id`
@@ -232,3 +233,14 @@ regardless of server configuration:
       (None, None),
       (None, None),
   ]
+
+
+lang
+----
+
+Override the language code for messages. The default is to use the
+value of `LANG` (Blinka/PyGame) or the language of the CircuitPython
+firmware.
+
+Currently, this is mandatory for Czech (`app_config.lang="cs"`), since
+Czech is not a supported CircuitPython language.

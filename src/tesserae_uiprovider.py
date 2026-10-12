@@ -109,7 +109,7 @@ class UIProvider:
     """ create message label """
 
     import locale, builtins
-    lang = locale.getlocale()[0]
+    lang = getattr(app_config, "lang", locale.getlocale()[0])
     try:
       lang_file = f"lang_{lang}"
       lang_module = builtins.__import__(lang_file,None,None,["MSG_TABLE"],0)
