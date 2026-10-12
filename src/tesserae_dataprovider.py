@@ -242,6 +242,7 @@ class DataProvider:
     if code in [401, 403, 404]:
       self.msg("invalid bearer token")
       self._api.token = None
+      self._api.etag = None
       data["token"] = None
       data["sleep_time"] = 1
       data["status"] = status.INITIAL
