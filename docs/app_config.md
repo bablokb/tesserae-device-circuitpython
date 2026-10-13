@@ -36,6 +36,7 @@ settings, see the sections below.
 | debug          | bool    | no    | False  | Verbose app messages        |
 | debug_api      | bool    | no    | False  | Verbose API operation       |
 | app_name       | str     | no³   |        | Local application name      |
+| retry_on_fail  | bool    | no    | False  | Retry on failures           |
 | run_interval   | int     | no    | 60     | Fallback interval           | 
 | time_table     | list    | no    |        | Local scheduling            |
 | lang           | str     | no    |        | Language code for messages  |
@@ -198,6 +199,19 @@ stable operation as long as the MAC-address is not reused for different
 displays. This only happens if you use one of the fullscreen-variants
 (`fullscreen`, `fullscreen90` or `fullscreen270`), because these use
 the hardware MAC as the default.
+
+
+retry_on_fail
+-------------
+
+In case of a failure, retry in `run_interval` seconds or (if defined)
+at the next time the local schedule fires (see `time_table`
+below). Setting `retry_on_fail` to `True` will recover from transient
+failures, but if the server is down repeated retries can run down the
+battery.
+
+For devices running on wall-power, it is recommended to turn this
+option on.
 
 
 run_interval
