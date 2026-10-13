@@ -146,6 +146,8 @@ class DataProvider:
 
     # illegal mode
     else:
+      data.pop("sleep_time", None)
+      data["status"] = status.ERR_UNKNOWN
       raise NotImplementedError(f"invalid download-mode {dl_mode}")
 
     gc.collect()
@@ -161,12 +163,12 @@ class DataProvider:
 
     # bail out (fatal errors):
     if code != 200:
+      self._data.pop("sleep_time", None)
       self._data["status"] = status.ERR_UNKNOWN
       raise RuntimeError(
         f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
     if headers.get("x-tesserae-device-id-changed", "false") != "false":
-      if "sleep_time" in self._data:
-        del self._data["sleep_time"]
+      self._data.pop("sleep_time", None)
       self._data["status"] = status.ERR_MAC
       raise RuntimeError(
         f"error: duplicate MAC for device_id: {self._data['device_id']}")
@@ -188,6 +190,7 @@ class DataProvider:
     code, headers, resp = self._api.register(pairing_code)
     if code != 201:
       # bail out
+      self._data.pop("sleep_time", None)
       self._data["status"] = status.ERR_UNKNOWN
       raise RuntimeError(f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
     self._data["token"] = self._api.token
@@ -227,6 +230,7 @@ class DataProvider:
     try:
       code, resp = self._api.frame()
     except Exception as ex:
+      data.pop("sleep_time", None)
       data["status"] = status.ERR_NET
       raise
     self.msg(f"/frame: {time.monotonic()-start:0.1f}s")
@@ -235,6 +239,7 @@ class DataProvider:
       self.msg(resp)
 
     if code not in [200, 204, 304, 401, 403, 404]:
+      data.pop("sleep_time", None)
       data["status"] = status.ERR_UNKNOWN
       raise RuntimeError(f"/frame: unexpected HTTP return code {code}")
 
@@ -277,6 +282,7 @@ class DataProvider:
       except Exception as ex:
         self.msg("failed to create bitmap from response")
         self.msg(f"  Exception: {ex}")
+        data.pop("sleep_time", None)
         data["status"] = status.ERR_UNKNOWN
         raise
       finally:
@@ -296,11 +302,16 @@ class DataProvider:
     if code < 400:
       # send status (with battery information)
       start = time.monotonic()
-      code, headers, resp = self._api.status(
-        {"battery_mv": 1000*data["bat_level"],
-         "fw_version": (f'CP client: {data["fw_version"]}/'+
-                        f'CP API: {self._panel.id["fw_version"]}'),
-         })
+      try:
+        code, headers, resp = self._api.status(
+          {"battery_mv": 1000*data["bat_level"],
+           "fw_version": (f'CP client: {data["fw_version"]}/'+
+                          f'CP API: {self._panel.id["fw_version"]}'),
+           })
+      except Exception as ex:
+        # clear sleep-time, but ignore exception on /status
+        data.pop("sleep_time", None)
+        return
       self.msg(f"/status: {time.monotonic()-start:0.1f}s")
       self.msg(f"api.status(): HTTP-code: {code}")
       if code == 200:
@@ -311,7 +322,7 @@ class DataProvider:
         if s_time and s_off:
           data["server_time"] = s_time + s_off
       else:
-        data["status"] = status.ERR_UNKNOWN
-        raise RuntimeError(f"/status: unexpected HTTP return code {code}")
-
+        # clear sleep-time, but ignore exception on /status
+        data.pop("sleep_time", None)
+        return
     return
