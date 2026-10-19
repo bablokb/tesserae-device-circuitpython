@@ -52,6 +52,7 @@ Examples
   - [Minimal Example](#minimal-example)
   - [Template Example](#template-example)
   - [External Display](#mcu-with-an-external-busdisplay)
+  - [Buttons](#buttons)
   - [Low Memory Systems (SD caching)](#low-memory-systems)
 
 
@@ -166,6 +167,57 @@ for a variant for the Adafruit Sharp-Display.
     hw_config.get_display  = _get_display
     hw_config.gamut = "rgb16"
     hw_config.eink  = False
+
+
+Buttons
+-------
+
+To use buttons, either the HAL or `hw_config` must define (at least)
+the attribute `BUTTONS`:
+
+    # hardware configuration   -------------------
+
+    class Settings:
+      pass
+
+    hw_config = Settings()
+    hw_config.get_display  = _get_display
+    hw_config.gamut = "rgb16"
+    hw_config.eink  = False
+
+    # format is ([pin, ...], value, pull)
+    hw_config.BUTTONS = ([board.D15, board.D14, board.D12, board.D11],
+                         False, True)
+    # format is ([pin, ...], value, edge, pull)
+    hw_config.WAKE_PINS = ([board.D15, board.D11],
+                           False, False, True)
+
+`WAKE_PINS` default to `BUTTONS`. Only set `WAKE_PINS` if the device
+cannot (or should not) wake up on the full set of buttons.
+
+On Blinka/PyGame, the buttons must be PyGame key constants
+(e.g. `pygame.K_LEFT`).
+
+Physical buttons must be mapped to Tesserae button names which in turn
+maps these names to actions. The first mapping is done in `app_config`:
+
+    # application configuration   ----------------
+
+    app_config = Settings()
+    app_config.url = "http://tesserae.local:8765/
+    app_config.app_name = "Tesserae-Client-1"    # for Blinka/PyGame
+    app_config.button_names = ["left", "up", "down", "right"]
+    app_config.w_button_names = ["left", "right"]
+
+The second mapping is done on the server
+(Settings->Devices->Device->Controls).
+
+On POR or a timed wakeup from deep-sleep, no button information is
+passed to the server. To change this behavior, set `app_config.def_w_button`, e.g.
+
+    app_config.def_w_button = "refresh"
+
+will force a refresh of the default dashboard on every POR/wakeup.
 
 
 Low Memory Systems

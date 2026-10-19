@@ -40,6 +40,9 @@ settings, see the sections below.
 | run_interval   | int     | no    | 60     | Fallback interval           | 
 | time_table     | list    | no    |        | Local scheduling            |
 | lang           | str     | no    |        | Language code for messages  |
+| button_names   | list    | no    |        | list of button names        |
+| w_button_names | list    | no    |        | list of wake button names   |
+| def_w_button   | str     | no    |        | default wake button name    |
 
 ¹ Legacy only - don't use for new configurations
 ² The name defaults to `board.board_id`
@@ -248,6 +251,13 @@ regardless of server configuration:
       (None, None),
   ]
 
+Local scheduling only manages the wakeup of the device, it does not
+manage a refresh of any configured dashboards. So either define a
+suitable schedule for the dashboards as well, or set
+`app_config.def_w_button = "refresh"` to force a just in time
+refresh. The latter only works for a single dashboard and since
+refreshing is synchronous it also prolonges the uptime.
+
 
 lang
 ----
@@ -258,3 +268,34 @@ firmware.
 
 Currently, this is mandatory for Czech (`app_config.lang="cs"`), since
 Czech is not a supported CircuitPython language.
+
+
+button_names
+------------
+
+A list of button names. This list has to have the same length as
+the list of hardware-buttons from `hw_config.BUTTONS`. This list maps
+the hardware buttons to names known to the Tesserae server, which maps
+them to actions.
+
+**Note**: Currently only button names that don't need url-encoding
+are supported!
+
+
+w_button_names
+--------------
+
+A list of wake button names. This defaults to the value of
+`button_names`.  The reason to have two different lists is that some
+MCUs only support a limited number buttons that trigger a wakeup from
+deep-sleep. The MagTag for example has four buttons but only two of
+them can be used for wakeup at the same time.
+
+
+def_w_button
+------------
+
+Button name to send to Tesserae in case of power-on or time-triggered
+wakeups. Set `def_w_button = "refresh"` to force a dashboard refresh
+on wakeup. Use this feature for client driven scheduling of dashboard
+updates. Don't set this for the standard case of server-driven updates.
