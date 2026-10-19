@@ -227,8 +227,14 @@ class DataProvider:
     # at this point we should have a token (or the pairing code is invalid)
     self._api.etag = data["etag"]
     start = time.monotonic()
+    params = {}
     try:
-      code, resp = self._api.frame()
+      event = data.pop("btn_event", None)   # consume event
+      if event and event[0]:
+        params["button"] = event[0]
+        if not event[1] is None:
+          params["button_event_id"] = event[1]
+      code, resp = self._api.frame(params)
     except Exception as ex:
       data.pop("sleep_time", None)
       data["status"] = status.ERR_NET
