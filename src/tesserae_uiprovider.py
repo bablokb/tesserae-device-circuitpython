@@ -69,7 +69,9 @@ class UIProvider:
       return self.show_message(data)
 
     # update display rotation (dashboard is rotated server-side)
-    self._display.rotation = 0
+    if (data["board_rotation"] in [90, 270] and
+        data["dl_mode"] == "FSCACHE"):
+      self._display.rotation = 0
 
     self.msg("processing dashboard:")
     dashboard = data["dashboard"]
