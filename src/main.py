@@ -61,6 +61,7 @@ class App(UIApplication):
 
     self.token = None
     self._etag  = None
+    self._btn_event_id = 0
 
     # fill in attributes needed by data and ui-provider
     self.data.update({
@@ -73,6 +74,7 @@ class App(UIApplication):
       "mac":          getattr(app_config,"mac", self.wifi.mac_address),
       "dl_mode":      self._get_dl_mode(),
       "dl_dir":       self._get_dl_dir(),
+      "btn_event":    self._get_wake_button(),
       })
 
     # width, height, rotation, ...
@@ -372,6 +374,34 @@ class App(UIApplication):
     except OSError:
       raise ValueError(
         f"error: Invalid dl_dir configuration. {dl_dir} does not exist")
+
+  # --- query wake button   ----------------------------------------------------
+
+  def _get_wake_button(self):
+    """ query wake button and return button/event_id """
+
+    # no event-id for on/off configurations
+    if getattr(app_config,"always_on",False):
+      event_id = self._btn_event_id
+      self._btn_event_id += 1
+    else:
+      event_id = None
+
+    btn = self.hal.get_wake_button()
+    self.msg(f"wake button (index): {btn}")
+    if btn is None:
+      # return button-name of a (simulated) button at wakeup
+      return getattr(app_config, "def_w_button", None), event_id
+    else:
+      try:
+        btn_names = getattr(app_config,"w_button_names",
+                             getattr(app_config, "button_names", []))
+        self.msg(f"button names: {btn_names}")
+        self.msg(f"wake button (name,id): {btn_names[btn]}, {event_id}")
+        return btn_names[btn], event_id
+      except:
+        # no application mapping for button
+        return None, None
 
 # --- main program   ---------------------------------------------------------
 
