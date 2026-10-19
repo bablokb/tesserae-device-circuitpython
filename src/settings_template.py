@@ -105,3 +105,14 @@ if disp_name:
   # settings_pygame will set rotation parameter for special cases
   if hasattr(hw_config, "rotation"):
     app_config.rotation = hw_config.rotation
+
+  # hardware-buttons and wake-pins (WAKE_PINS default to BUTTONS)
+  import pygame
+  hw_config.BUTTONS = ([pygame.K_LEFT, pygame.K_HOME, pygame.K_RIGHT],
+                       True, True)
+  #hw_config.WAKE_PINS = hw_config.BUTTONS
+
+  # app-level button names (mapped on the Tesserae-server)
+  app_config.button_names = ["left", "refresh", "right"]
+  #app_config.w_button_names = app_config.button_names
+  #app_config.def_w_button = "refresh"
