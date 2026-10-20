@@ -234,6 +234,8 @@ class DataProvider:
         params["button"] = event[0]
         if not event[1] is None:
           params["button_event_id"] = event[1]
+        if event[0] == "refresh":
+          self._api.etag = None
       code, resp = self._api.frame(params)
     except Exception as ex:
       data.pop("sleep_time", None)
