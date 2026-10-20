@@ -43,6 +43,7 @@ settings, see the sections below.
 | button_names   | list    | no    |        | list of button names        |
 | w_button_names | list    | no    |        | list of wake button names   |
 | def_w_button   | str     | no    |        | default wake button name    |
+| start_delay    | int     | no    | 0      | add delay after init        |
 
 ¹ Legacy only - don't use for new configurations
 ² The name defaults to `board.board_id`
@@ -299,3 +300,12 @@ Button name to send to Tesserae in case of power-on or time-triggered
 wakeups. Set `def_w_button = "refresh"` to force a dashboard refresh
 on wakeup. Use this feature for client driven scheduling of dashboard
 updates. Don't set this for the standard case of server-driven updates.
+
+
+start_delay
+-----------
+
+Add an additional delay after initialization. This allows users to
+push a button *after* wakeup but *before* any requests to the server.
+The main use-case is for devices with more buttons than wake-enabled
+GPIOs (e.g. ESP32-S2).
