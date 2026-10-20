@@ -59,6 +59,11 @@ class App(UIApplication):
     if not hasattr(self.hal, "eink"):
       raise ValueError("'eink' not defined in hw_config")
 
+    # create keypad early to catch button events
+    # returns just a reference, we don't need it here
+    if hasattr(self.hal, "BUTTONS"):
+      self.hal.keypad()
+
     self.token = None
     self._etag  = None
     self._btn_event_id = 0
@@ -92,6 +97,56 @@ class App(UIApplication):
       "304update":    not self.hal.eink or not self._etag
       })
 
+    # add an optional startup delay (e.g. to catch button-events)
+    delay_end = time.monotonic() + getattr(app_config, "start_delay", 0)
+    blink_time = getattr(self,"led_blink_init",0.1)
+    while time.monotonic() < delay_end:
+      self.blink(blink_time)
+      self.hal.sleep(blink_time)
+
+  # --- process button events   ----------------------------------------------
+
+  def process_events(self):
+    """ process button-events """
+
+    keys = self.hal.keypad()
+    if not keys:                 # no keypad defined
+      return False
+    ev = keys.events.get()
+    if not ev or ev.released:    # no pending button event
+      return False
+    keys.events.clear()          # clear so we don't loop on pressed/released
+
+    # no event-id for on/off configurations
+    if getattr(app_config,"always_on",False):
+      event_id = self._btn_event_id
+      self._btn_event_id += 1
+    else:
+      event_id = None
+
+    btn = ev.key_number
+    self.msg(f"button (index): {btn}")
+    try:
+      btn_names = getattr(app_config, "button_names", [])
+      self.msg(f"button names: {btn_names}")
+      self.msg(f"button-event (name,id): {btn_names[btn]}, {event_id}")
+      self.data["btn_event"] = btn_names[btn], event_id
+      return True
+    except:
+      self.msg(f"warning: no application mapping for button {btn}")
+      return False
+
+  # --- run at start of run()   ----------------------------------------------
+
+  def run_start(self):
+    """ process pending button event.
+    This allows the user to wake with one button and press a second
+    button to workaround a limited number of wake-buttons. It also
+    allows to press a button during e.g. update and trigger a follow-up
+    action at once.
+    """
+    self.process_events()
+
   # --- override idle-processing   -------------------------------------------
 
   def run_idle(self):
@@ -106,6 +161,7 @@ class App(UIApplication):
     while time.monotonic()-self._run_start < interval:
       if self.process_events():
         return
+      self.hal.sleep(0.05)
 
   # --- run at end of run()   ------------------------------------------------
 
@@ -422,14 +478,17 @@ atexit.register(at_exit,app)
 app.msg(f"startup duration: {time.monotonic()-start:f}s")
 app.msg(f"startup free-mem: {mem_free_start}")
 
-if getattr(app_config,"always_on",False):
-  app.msg(f"runing endless")
-  while True:
-    app.run()
-else:
-  while not app.token:
-    # stay online and loop until we have a valid token
-    # this loops twice for /discover and once for /register
-    app.run()
-  app.msg(f"running once")
-  app.run_once()
+# initial discovery and registration
+while not app.token:
+  # stay online and loop until we have a valid token
+  # this loops twice for /discover and once for /register
+  app.run()
+
+# main application loop
+# Note: this will degenerate to a single run if 'always_on' is
+#       False and there are no pending button-events, since
+#       app.run() will then call shutdown/deep-sleep
+once = not getattr(app_config,"always_on",False)
+app.msg(f"running {'once' if once else 'endless'}")
+while True:
+  app.run(once=once)
