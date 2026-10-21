@@ -188,7 +188,7 @@ class DataProvider:
   def register(self, pairing_code):
     """ use fallback registration """
     code, headers, resp = self._api.register(pairing_code)
-    if code != 201:
+    if code not in [200, 201]:
       # bail out
       self._data.pop("sleep_time", None)
       self._data["status"] = status.ERR_UNKNOWN
