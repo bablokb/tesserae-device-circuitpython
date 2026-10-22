@@ -196,7 +196,7 @@ class DataProvider:
     self._data["token"] = self._api.token
     self._data["status"] = status.REGISTERED
     self.msg(
-      f"registered with token: {self._api.token} (reused: {resp.reused_existing}"
+      f"registered with token: {self._api.token} (reused: {resp['reused_existing']}"
     )
 
   # --- query data   ---------------------------------------------------------
