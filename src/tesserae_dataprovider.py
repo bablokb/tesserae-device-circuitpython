@@ -317,6 +317,7 @@ class DataProvider:
                           f'CP API: {self._panel.id["fw_version"]}'),
            })
       except Exception as ex:
+        self.msg(f"/status: failed with exception {ex}")
         # clear sleep-time, but ignore exception on /status
         data.pop("sleep_time", None)
         return
