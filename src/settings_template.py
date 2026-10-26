@@ -107,10 +107,11 @@ if disp_name:
     app_config.rotation = hw_config.rotation
 
   # hardware-buttons and wake-pins (WAKE_PINS default to BUTTONS)
+  # Explicitly defined WAKE_PINS need a tuple with four entries due to
+  # how button wake is defined in native CircuitPython!
   import pygame
   hw_config.BUTTONS = ([pygame.K_LEFT, pygame.K_HOME, pygame.K_RIGHT],
                        True, True)
-  #hw_config.WAKE_PINS = hw_config.BUTTONS
 
   # app-level button names (mapped on the Tesserae-server)
   app_config.button_names = ["left", "refresh", "right"]
