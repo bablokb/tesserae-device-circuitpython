@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.15.1"
+FIRMWARE_VERSION= "0.15.2"
 
 # --- imports   --------------------------------------------------------------
 
@@ -113,7 +113,9 @@ class App(UIApplication):
     if not keys:                 # no keypad defined
       return False
     ev = keys.events.get()
-    if not ev or ev.released:    # no pending button event
+    while ev and ev.released:    # skip release events
+      ev = keys.events.get()
+    if not ev:                   # no pending button event
       return False
     keys.events.clear()          # clear so we don't loop on pressed/released
 
@@ -151,6 +153,10 @@ class App(UIApplication):
 
   def run_idle(self):
     """ Overriden to honor sleep_time set by data-provider """
+    if self.token and not getattr(app_config, "always_on", False):
+      # token acquired during the initial loop: return to the
+      # main loop, which will shutdown/deep-sleep
+      return
     if "sleep_time" in self.data:
       interval = self.data["sleep_time"]
     else:
