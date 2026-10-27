@@ -99,6 +99,7 @@ Successfully tested:
   - **Blinka with PyGame-Displayio** on Linux, Pi3, Pi5
   - **Blinka with PyGame-Displayio** on MacOS
   - **Pimoroni Inky-Frame-5.7** (embedded Pico-W): works with caching on SD
+  - **Pimoroni Badger2350** (RP2350, 264x176, 4 graylevels)
 
 Failed devices:
 
