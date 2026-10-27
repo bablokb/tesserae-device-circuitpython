@@ -194,7 +194,11 @@ class DataProvider:
       self._data["status"] = status.ERR_UNKNOWN
       raise RuntimeError(f"Tesserae-Server HTTP-Code: {code}, content: {resp}")
     self._data["token"] = self._api.token
-    self._data["status"] = status.REGISTERED
+    self._data["status"] = status.NO_PUSH
+    if not "configuration" in resp:
+      self._data["sleep_time"] = getattr(app_config, "run_interval", 60)
+    else:
+      self._data["sleep_time"] = resp["configuration"].get("sleep_interval_s",60)
     self.msg(
       f"registered with token: {self._api.token} (reused: {resp['reused_existing']}"
     )
@@ -217,6 +221,7 @@ class DataProvider:
     if not data["token"]:
       if data["pairing_code"]:
         self.register(data["pairing_code"])
+        return
       else:
         wait_time = self.discover()
         if wait_time:
