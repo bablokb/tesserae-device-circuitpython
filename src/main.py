@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.15.3"
+FIRMWARE_VERSION= "0.15.4"
 
 # --- imports   --------------------------------------------------------------
 
@@ -129,7 +129,8 @@ class App(UIApplication):
     btn = ev.key_number
     self.msg(f"button (index): {btn}")
     try:
-      btn_names = getattr(app_config, "button_names", [])
+      btn_names = getattr(app_config, "button_names",
+                          getattr(self.hal, "button_names", []))
       self.msg(f"button names: {btn_names}")
       self.msg(f"button-event (name,id): {btn_names[btn]}, {event_id}")
       self.data["btn_event"] = btn_names[btn], event_id
@@ -456,8 +457,15 @@ class App(UIApplication):
       return getattr(app_config, "def_w_button", None), event_id
     else:
       try:
-        btn_names = getattr(app_config,"w_button_names",
-                             getattr(app_config, "button_names", []))
+        # get button-names with three levels of fallback
+        btn_names = []
+        for obj, attr in [(app_config, "w_button_names"),
+                          (app_config, "button_names"),
+                          (self.hal,   "w_button_names"),
+                          (self.hal,   "button_names"),]:
+          if hasattr(obj, attr):
+            btn_names = getattr(obj, attr)
+            break
         self.msg(f"button names: {btn_names}")
         self.msg(f"wake button (name,id): {btn_names[btn]}, {event_id}")
         return btn_names[btn], event_id
