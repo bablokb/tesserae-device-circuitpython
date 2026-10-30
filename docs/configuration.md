@@ -219,6 +219,9 @@ passed to the server. To change this behavior, set `app_config.def_w_button`, e.
 
 will force a refresh of the default dashboard on every POR/wakeup.
 
+If the HAL or hw_config defines default button names, they are used as
+fallback values if the application does not define the mapping itself.
+
 
 Low Memory Systems
 ------------------

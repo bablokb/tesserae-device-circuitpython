@@ -279,6 +279,9 @@ the list of hardware-buttons from `hw_config.BUTTONS`. This list maps
 the hardware buttons to names known to the Tesserae server, which maps
 them to actions.
 
+If unset, the fallback-value is from the HAL (or hw_config), if defined
+there.
+
 **Note**: Currently only button names that don't need url-encoding
 are supported!
 
@@ -286,11 +289,20 @@ are supported!
 w_button_names
 --------------
 
-A list of wake button names. This defaults to the value of
-`button_names`.  The reason to have two different lists is that some
-MCUs only support a limited number buttons that trigger a wakeup from
-deep-sleep. The MagTag for example has four buttons but only two of
-them can be used for wakeup at the same time.
+A list of wake button names. The reason to have two different lists is
+that some MCUs only support a limited number buttons that trigger a
+wakeup from deep-sleep. The MagTag for example has four buttons but
+only two of them can be used for wakeup at the same time.
+
+Values are taken in this order:
+
+  - `app_config.w_button_names`
+  - `app_config.button_names`
+  - `self.hal.w_button_names`
+  - `self.hal.button_names`
+
+So if the HAL or hardware-configuration already provides a suitable
+definition, setting it in `app_config` is not necessary.
 
 
 def_w_button
