@@ -36,7 +36,7 @@ def wait_for_console(duration=5):
     import supervisor
     import time
     elapsed = time.monotonic() + duration
-    while (not supervisor.runtime.serial_connected and
+    while (not supervisor.runtime.usb_connected and
            time.monotonic() < elapsed):
       time.sleep(1)
   except:
