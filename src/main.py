@@ -437,21 +437,12 @@ class App(UIApplication):
   def _get_wake_button(self):
     """ query wake button and return button/event_id """
 
-    # no event-id for on/off configurations
-    if getattr(app_config,"always_on",False):
-      event_id = self._btn_event_id
-      self._btn_event_id += 1
-    else:
-      event_id = None
-
+    # check for button wakeup.
+    self.msg("checking for button-wakeup")
     index = self.hal.get_wake_button()
-    self.msg(f"wake button (index): {index}")
-    if index is None:
-      # return button-name of a (simulated) button at wakeup
-      return getattr(app_config, "def_w_button", None), event_id
-    else:
+    if index:
+      # get button-names with three levels of fallback and map button
       try:
-        # get button-names with three levels of fallback
         btn_names = []
         for obj, attr in [(app_config, "w_button_names"),
                           (app_config, "button_names"),
@@ -459,13 +450,33 @@ class App(UIApplication):
                           (self.hal,   "button_names"),]:
           if hasattr(obj, attr):
             btn_names = getattr(obj, attr)
+            self.msg(f"button names: {btn_names}")
             break
-        self.msg(f"button names: {btn_names}")
-        self.msg(f"wake button (name,id): {btn_names[index]}, {event_id}")
-        return btn_names[index], event_id
+        button_name = btn_names[index]
       except:
-        # no application mapping for button
-        return None, None
+        # no valid mapping
+        button_name = None
+    else:
+      # no button wakeup, use default "button" if configured
+      button_name = getattr(app_config, "def_w_button", None)
+      if button_name:
+        self.msg(f"using default wakeup 'button': {button_name}")
+
+    # if we don't have a button-name, return
+    if not button_name:
+      self.msg("no button wakeup")
+      return None, None
+
+    # no event-id for on/off configurations
+    if getattr(app_config,"always_on",False):
+      event_id = self._btn_event_id
+      self._btn_event_id += 1
+    else:
+      event_id = None
+
+    # return button and event_id
+    self.msg(f"wake button: (name={button_name},id={event_id})")
+    return button_name, event_id
 
 # --- main program   ---------------------------------------------------------
 
