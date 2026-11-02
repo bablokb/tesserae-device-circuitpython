@@ -109,15 +109,9 @@ class App(UIApplication):
   def process_events(self):
     """ process button-events """
 
-    keys = self.hal.keypad()
-    if not keys:                 # no keypad defined
+    ev = self.hal.get_key_event()
+    if not ev:
       return False
-    ev = keys.events.get()
-    while ev and ev.released:    # skip release events
-      ev = keys.events.get()
-    if not ev:                   # no pending button event
-      return False
-    keys.events.clear()          # clear so we don't loop on pressed/released
 
     # no event-id for on/off configurations
     if getattr(app_config,"always_on",False):
@@ -126,17 +120,17 @@ class App(UIApplication):
     else:
       event_id = None
 
-    btn = ev.key_number
-    self.msg(f"button (index): {btn}")
+    index = ev[0]
+    self.msg(f"button (index): {index}")
     try:
       btn_names = getattr(app_config, "button_names",
                           getattr(self.hal, "button_names", []))
       self.msg(f"button names: {btn_names}")
-      self.msg(f"button-event (name,id): {btn_names[btn]}, {event_id}")
-      self.data["btn_event"] = btn_names[btn], event_id
+      self.msg(f"button-event (name,id): {btn_names[index]}, {event_id}")
+      self.data["btn_event"] = btn_names[index], event_id
       return True
     except:
-      self.msg(f"warning: no application mapping for button {btn}")
+      self.msg(f"warning: no application mapping for button {index}")
       return False
 
   # --- run at start of run()   ----------------------------------------------
@@ -450,9 +444,9 @@ class App(UIApplication):
     else:
       event_id = None
 
-    btn = self.hal.get_wake_button()
-    self.msg(f"wake button (index): {btn}")
-    if btn is None:
+    index = self.hal.get_wake_button()
+    self.msg(f"wake button (index): {index}")
+    if index is None:
       # return button-name of a (simulated) button at wakeup
       return getattr(app_config, "def_w_button", None), event_id
     else:
@@ -467,8 +461,8 @@ class App(UIApplication):
             btn_names = getattr(obj, attr)
             break
         self.msg(f"button names: {btn_names}")
-        self.msg(f"wake button (name,id): {btn_names[btn]}, {event_id}")
-        return btn_names[btn], event_id
+        self.msg(f"wake button (name,id): {btn_names[index]}, {event_id}")
+        return btn_names[index], event_id
       except:
         # no application mapping for button
         return None, None
