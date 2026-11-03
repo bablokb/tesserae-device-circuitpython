@@ -440,7 +440,7 @@ class App(UIApplication):
     # check for button wakeup.
     self.msg("checking for button-wakeup")
     index = self.hal.get_wake_button()
-    if index:
+    if not index is None:
       # get button-names with three levels of fallback and map button
       try:
         btn_names = []
