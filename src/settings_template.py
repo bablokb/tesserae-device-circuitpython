@@ -25,6 +25,31 @@ secrets.retry     = 2
 #secrets.channel   = 6
 #secrets.timeout   = 10
 
+# --- log-writer   -----------------------------------------------------------
+
+# This is an example log-writer to override the default logging in debug-mode.
+# Set `app_config.logger = get_logger` to activate this logger.
+# Note: this example will only work with Blinka/PyGame and needs adaption for
+#       native CP running on MCUs (e.g. write to a SDCard or to UART).
+
+_app = None
+def _log(src, *args):
+  if _app and _app._debug:
+    for line in _app.log_message(src, *args):
+      # write to a log file
+      with open("/tmp/tesserae-client.log", "a") as f:
+        f.write(f"{line}\n")
+      # this is the default behavior
+      print(line)
+  else:
+    print(*args)
+
+def get_logger(app):
+  """ return log-helper """
+  global _app
+  _app = app
+  return _log
+
 # hardware configuration   ---------------------------------------------------
 
 try:

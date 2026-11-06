@@ -49,6 +49,7 @@ def at_exit(app):
 
 # --- application class with overrides   --------------------------------------
 
+LOG_SRC = "App"
 class App(UIApplication):
   """ class App """
   def __init__(self,*args,**kwargs):
@@ -121,16 +122,16 @@ class App(UIApplication):
       event_id = None
 
     index = ev[0]
-    self.msg(f"button (index): {index}")
+    self.log(LOG_SRC, f"button (index): {index}")
     try:
       btn_names = getattr(app_config, "button_names",
                           getattr(self.hal, "button_names", []))
-      self.msg(f"button names: {btn_names}")
-      self.msg(f"button-event (name,id): {btn_names[index]}, {event_id}")
+      self.log(LOG_SRC, f"button names: {btn_names}")
+      self.log(LOG_SRC, f"button-event (name,id): {btn_names[index]}, {event_id}")
       self.data["btn_event"] = btn_names[index], event_id
       return True
     except:
-      self.msg(f"warning: no application mapping for button {index}")
+      self.log(LOG_SRC, f"warning: no application mapping for button {index}")
       return False
 
   # --- run at start of run()   ----------------------------------------------
@@ -158,7 +159,7 @@ class App(UIApplication):
       # application default run-interval
       interval = getattr(app_config, "run_interval", 60)
 
-    self.msg(f"running idle for {interval}s")
+    self.log(LOG_SRC, f"running idle for {interval}s")
     while time.monotonic()-self._run_start < interval:
       if self.process_events():
         return
@@ -184,10 +185,10 @@ class App(UIApplication):
     # set local time from server time
     s_time = self.data.get("server_time", None)
     if s_time:
-      self.msg(f"updating RTCs")
+      self.log(LOG_SRC, f"updating RTCs")
       self.hal.update_rtc(s_time)
       now = time.localtime()
-      self.msg("now:", now)
+      self.log(LOG_SRC, "now:", now)
 
   # --- read persisted data   ------------------------------------------------
 
@@ -196,18 +197,18 @@ class App(UIApplication):
 
     if hasattr(app_config,"token"):
       # use hard coded token
-      self.msg(f"using hard-coded token: {app_config.token}")
+      self.log(LOG_SRC, f"using hard-coded token: {app_config.token}")
       self.token = app_config.token
       self.data["status"] = status.REGISTERED
     else:
       self.token = None
 
     self._magic = getattr(app_config, "magic", 0x4201)
-    self.msg(f"reading data from NVRAM with magic: {self._magic}")
+    self.log(LOG_SRC, f"reading data from NVRAM with magic: {self._magic}")
     buffer = self.hal.nvram_read(0, 3)
     if not self._magic == int(buffer[:2].hex(),16):
       # magic number does not match, invalidate token
-      self.msg("magic number does not match, no data read")
+      self.log(LOG_SRC, "magic number does not match, no data read")
       self._etag = None
       self.data["status"] = status.INITIAL
       return
@@ -216,21 +217,21 @@ class App(UIApplication):
     if not self.token:
       # read token
       self.token = self.hal.nvram_read(3, buffer[2]).decode()
-      self.msg(f"token read from NVRAM: {self.token}")
+      self.log(LOG_SRC, f"token read from NVRAM: {self.token}")
       self.data["status"] = status.REGISTERED
     offset = 3 + buffer[2]
     len_etag = self.hal.nvram_read(offset, 1)[0]
-    self.msg(f"{len_etag=}")
+    self.log(LOG_SRC, f"{len_etag=}")
     if len_etag:
       try:
         self._etag = self.hal.nvram_read(offset+1, len_etag).decode()
-        self.msg(f"etag read from NVRAM: {self._etag}")
+        self.log(LOG_SRC, f"etag read from NVRAM: {self._etag}")
       except:
         self._etag = None
-        self.msg("no valid etag in NVRAM")
+        self.log(LOG_SRC, "no valid etag in NVRAM")
     else:
       self._etag = None
-      self.msg("no saved etag in NVRAM")
+      self.log(LOG_SRC, "no saved etag in NVRAM")
 
   # --- persist token and etag   ---------------------------------------------
 
@@ -246,11 +247,11 @@ class App(UIApplication):
     if (self.data["token"] == self.token and
         self.data["etag"] == self._etag):
       # no new data, nothing to save
-      self.msg("not saving data (no change)")
+      self.log(LOG_SRC, "not saving data (no change)")
       return
     elif self.data["token"] == None:
       # dataprovider invalidated the token, clear magic-number
-      self.msg(f"token invalidated, clearing NVRAM")
+      self.log(LOG_SRC, f"token invalidated, clearing NVRAM")
       self.hal.nvram_write(0, b'\x00\x00')
       return
 
@@ -270,7 +271,7 @@ class App(UIApplication):
     buffer[offset]  = len(etag); offset += 1
     if len(etag):
       buffer[offset:offset+len(etag)] = etag
-    self.msg(f"saving '{buffer}' to NVRAM")
+    self.log(LOG_SRC, f"saving '{buffer}' to NVRAM")
     self.hal.nvram_write(0, buffer)
 
   # --- set display attributes depending on download-mode and rotation   -----
@@ -314,18 +315,18 @@ class App(UIApplication):
       "rgb16": 65535,
       "rgb24": 65535,
       }
-    self.msg(
+    self.log(LOG_SRC,
       "creating Bitmap for display with " +
       f"{self.display.width}x{self.display.height}@{col_map[self.hal.gamut]}")
     gc.collect()
     if hasattr(gc,"mem_free"):
-      self.msg(f"free memory before Bitmap allocation: {gc.mem_free()}")
+      self.log(LOG_SRC, f"free memory before Bitmap allocation: {gc.mem_free()}")
     bitmap = (Bitmap(self.display.width,
                      self.display.height,
                      col_map[self.hal.gamut]),
               None)
     if hasattr(gc,"mem_free"):
-      self.msg(f"free memory after Bitmap allocation: {gc.mem_free()}")
+      self.log(LOG_SRC, f"free memory after Bitmap allocation: {gc.mem_free()}")
     return bitmap
 
   # --- helper for _sanitize   -----------------------------------------------
@@ -407,7 +408,7 @@ class App(UIApplication):
       else:
         dl_mode = "RAM"
 
-    self.msg(f"using dl_mode: {dl_mode}")
+    self.log(LOG_SRC, f"using dl_mode: {dl_mode}")
     return dl_mode
 
   # --- query download directory   -------------------------------------------
@@ -426,7 +427,7 @@ class App(UIApplication):
     import os
     try:
       os.listdir(dl_dir)
-      self.msg(f"using dl_dir: {dl_dir}")
+      self.log(LOG_SRC, f"using dl_dir: {dl_dir}")
       return dl_dir
     except OSError:
       raise ValueError(
@@ -438,7 +439,7 @@ class App(UIApplication):
     """ query wake button and return button/event_id """
 
     # check for button wakeup.
-    self.msg("checking for button-wakeup")
+    self.log(LOG_SRC, "checking for button-wakeup")
     index = self.hal.get_wake_button()
     if not index is None:
       # get button-names with three levels of fallback and map button
@@ -450,7 +451,7 @@ class App(UIApplication):
                           (self.hal,   "button_names"),]:
           if hasattr(obj, attr):
             btn_names = getattr(obj, attr)
-            self.msg(f"button names: {btn_names}")
+            self.log(LOG_SRC, f"button names: {btn_names}")
             break
         button_name = btn_names[index]
       except:
@@ -460,11 +461,11 @@ class App(UIApplication):
       # no button wakeup, use default "button" if configured
       button_name = getattr(app_config, "def_w_button", None)
       if button_name:
-        self.msg(f"using default wakeup 'button': {button_name}")
+        self.log(LOG_SRC, f"using default wakeup 'button': {button_name}")
 
     # if we don't have a button-name, return
     if not button_name:
-      self.msg("no button wakeup")
+      self.log(LOG_SRC, "no button wakeup")
       return None, None
 
     # no event-id for on/off configurations
@@ -475,7 +476,7 @@ class App(UIApplication):
       event_id = None
 
     # return button and event_id
-    self.msg(f"wake button: (name={button_name},id={event_id})")
+    self.log(LOG_SRC, f"wake button: (name={button_name},id={event_id})")
     return button_name, event_id
 
 # --- main program   ---------------------------------------------------------
@@ -485,17 +486,22 @@ if hasattr(gc,"mem_free"):
 else:
   mem_free_start = "unknown"
 
-if getattr(app_config,"debug",False):
+debug = getattr(app_config,"debug",False)
+if debug:
   wait_for_console()
 
 start = time.monotonic()
+
 data_provider = DataProvider()
 ui_provider = UIProvider()
-
 app = App(data_provider,ui_provider)
+if debug:
+  data_provider.log = app.log
+  ui_provider.log = app.log
+
 atexit.register(at_exit,app)
-app.msg(f"startup duration: {time.monotonic()-start:f}s")
-app.msg(f"startup free-mem: {mem_free_start}")
+app.log("main", f"startup duration: {time.monotonic()-start:f}s")
+app.log("main", f"startup free-mem: {mem_free_start}")
 
 # initial discovery and registration
 while not app.token:
@@ -508,6 +514,6 @@ while not app.token:
 #       False and there are no pending button-events, since
 #       app.run() will then call shutdown/deep-sleep
 once = not getattr(app_config,"always_on",False)
-app.msg(f"running {'once' if once else 'endless'}")
+app.log("main", f"running {'once' if once else 'endless'}")
 while True:
   app.run(once=once)

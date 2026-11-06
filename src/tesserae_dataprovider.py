@@ -20,25 +20,18 @@ import status
 
 # --- main data-provider class   ---------------------------------------------
 
+LOG_SRC = "DataProvider"
 class DataProvider:
 
   def __init__(self):
-    self._debug = getattr(app_config, "debug", False)
     self._wifi  = None
     self._api   = None
 
   # --- print debug-message   ------------------------------------------------
 
-  def msg(self,text):
-    """ print (debug) message """
-    if self._debug:
-      if isinstance(text, dict):
-        print("DataProvider: {")
-        for key, value in text.items():
-          print(f"DataProvider:   {key}: {value}")
-        print("DataProvider: }")
-      else:
-        print(f"DataProvider: {text}")
+  def log(self, src, text):
+    """ print (debug) message. Override from application """
+    pass
 
   # --- set wifi-object   ----------------------------------------------------
 
@@ -50,7 +43,7 @@ class DataProvider:
 
   def _create_api(self):
     """ create API interface """
-    self.msg("creating API-interface")
+    self.log(LOG_SRC, "creating API-interface")
     if not self._wifi.radio.connected:
       self._wifi.connect()
 
@@ -65,8 +58,10 @@ class DataProvider:
     self._api   = Tesserae_API(self._panel.id,
                                self._data["url"],
                                self._wifi.requests,
-                               token=self._data["token"],
-                               debug=getattr(app_config, "debug_api", False))
+                               token=self._data["token"])
+
+    if getattr(app_config, "debug_api", False):
+      self._api.log = self.log
 
   # --- create bitmap   ------------------------------------------------------
 
@@ -75,7 +70,7 @@ class DataProvider:
 
     gc.collect()
     if hasattr(gc,"mem_free"):
-      self.msg(f"free memory before imageload: {gc.mem_free()}")
+      self.log(LOG_SRC, f"free memory before imageload: {gc.mem_free()}")
 
     # reuse existing bitmap if available
     dl_mode = self._data["dl_mode"]
@@ -90,14 +85,14 @@ class DataProvider:
       import io
       start = time.monotonic()
       io_obj = self._api.url_content(io_obj=io.BytesIO(bytearray(0)))
-      self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
+      self.log(LOG_SRC, f"url_content(): {time.monotonic()-start:0.1f}s")
 
     # create PyGame surface if requested
     if dl_mode == "PYGAME":
       import pygame
       start = time.monotonic()
       self._data["dashboard"] = pygame.image.load(io_obj).convert()
-      self.msg(f"pygame.image.load(): {time.monotonic()-start:0.1f}s")
+      self.log(LOG_SRC, f"pygame.image.load(): {time.monotonic()-start:0.1f}s")
       io_obj.close()
 
     # stream the bmp to the bitmap. main.py enforces bmp for STREAM
@@ -113,7 +108,7 @@ class DataProvider:
     elif dl_mode == "RAM":
       start = time.monotonic()
       self._data["dashboard"] = imageload.load(io_obj, bitmap)
-      self.msg(f"imageload.load(): {time.monotonic()-start:0.1f}s")
+      self.log(LOG_SRC, f"imageload.load(): {time.monotonic()-start:0.1f}s")
       io_obj.close()
 
     # download directly to a file and create an OnDiskBitmap
@@ -126,15 +121,15 @@ class DataProvider:
           dl_file = open(dl_fname,"wb")
           start = time.monotonic()
           self._api.url_content(io_obj=dl_file)
-          self.msg(f"url_content(): {time.monotonic()-start:0.1f}s")
-          self.msg(f"downloaded file to {dl_fname}")
+          self.log(LOG_SRC, f"url_content(): {time.monotonic()-start:0.1f}s")
+          self.log(LOG_SRC, f"downloaded file to {dl_fname}")
           dl_file.close()
-          self.msg("creating OnDiskBitmap from image file")
+          self.log(LOG_SRC, "creating OnDiskBitmap from image file")
           import displayio
           self._data["dashboard"] = displayio.OnDiskBitmap(dl_fname)
           break
         except Exception as ex:
-          self.msg(f"download failed with exception: {ex}")
+          self.log(LOG_SRC, f"download failed with exception: {ex}")
           if attempt == Tesserae_API.RETRIES-1:
             raise
         finally:
@@ -152,7 +147,7 @@ class DataProvider:
 
     gc.collect()
     if hasattr(gc,"mem_free"):
-      self.msg(f"free memory after imageload: {gc.mem_free()}")
+      self.log(LOG_SRC, f"free memory after imageload: {gc.mem_free()}")
     return
 
   # --- discovery helper   ---------------------------------------------------
@@ -175,12 +170,12 @@ class DataProvider:
 
     if resp.get("registered",False):
       self._data["status"] = status.REGISTERED
-      self.msg(f"registered with token: {self._api.token}")
+      self.log(LOG_SRC, f"registered with token: {self._api.token}")
       self._data["token"] = self._api.token
       return 0
     else:
       self._data["status"] = status.WAITING
-      self.msg("waiting for admin registration")
+      self.log(LOG_SRC, "waiting for admin registration")
       return resp.get("retry_after_s",30)
 
   # --- register helper   --------------------------------------------------
@@ -199,7 +194,7 @@ class DataProvider:
       self._data["sleep_time"] = getattr(app_config, "run_interval", 60)
     else:
       self._data["sleep_time"] = resp["configuration"].get("sleep_interval_s",60)
-    self.msg(
+    self.log(LOG_SRC,
       f"registered with token: {self._api.token} (reused: {resp['reused_existing']}"
     )
 
@@ -246,10 +241,10 @@ class DataProvider:
       data.pop("sleep_time", None)
       data["status"] = status.ERR_NET
       raise
-    self.msg(f"/frame: {time.monotonic()-start:0.1f}s")
-    self.msg(f"api.frame(): HTTP-code: {code}")
+    self.log(LOG_SRC, f"/frame: {time.monotonic()-start:0.1f}s")
+    self.log(LOG_SRC, f"api.frame(): HTTP-code: {code}")
     if resp:
-      self.msg(resp)
+      self.log(LOG_SRC, resp)
 
     if code not in [200, 204, 304, 401, 403, 404]:
       data.pop("sleep_time", None)
@@ -258,7 +253,7 @@ class DataProvider:
 
     # if token is invalid, delete and restart
     if code in [401, 403, 404]:
-      self.msg("invalid bearer token")
+      self.log(LOG_SRC, "invalid bearer token")
       self._api.token = None
       self._api.etag = None
       data["token"] = None
@@ -268,7 +263,7 @@ class DataProvider:
     # stage the etag. It is promoted to data["etag"] by run_end(), i.e.
     # only after the frame has actually been painted.
     if code == 200:
-      self.msg(f"new etag: {self._api.etag}")
+      self.log(LOG_SRC, f"new etag: {self._api.etag}")
       data["etag_pending"] = self._api.etag
 
     # fetch dashboard data for HTTP200 and if requested
@@ -279,29 +274,29 @@ class DataProvider:
       # check if extension is bmp if FSCACHE is set. Otherwise,
       # force re-registration
       if self._data["dl_mode"] == "FSCACHE" and ext != "bmp":
-        self.msg("FSCACHE needs bmp, not png. Forcing new registration")
+        self.log(LOG_SRC, "FSCACHE needs bmp, not png. Forcing new registration")
         self._api.token = None
         data["token"] = None
         data["sleep_time"] = 1
         data["status"] = status.INITIAL
         return
 
-      self.msg(f"fetching dashboard for HTTP-code {code}")
+      self.log(LOG_SRC, f"fetching dashboard for HTTP-code {code}")
       start = time.monotonic()
       response = None
       try:
         self._create_bitmap(ext)
         data["status"] = status.READY
       except Exception as ex:
-        self.msg("failed to create bitmap from response")
-        self.msg(f"  Exception: {ex}")
+        self.log(LOG_SRC, "failed to create bitmap from response")
+        self.log(LOG_SRC, f"  Exception: {ex}")
         data.pop("sleep_time", None)
         data["status"] = status.ERR_UNKNOWN
         raise
       finally:
         if response:
           response = None
-      self.msg(f"fetch dashboard: {time.monotonic()-start:0.1f}s")
+      self.log(LOG_SRC, f"fetch dashboard: {time.monotonic()-start:0.1f}s")
     elif code == 204:
       data["status"] = status.NO_PUSH
     elif code == 304:
@@ -310,7 +305,7 @@ class DataProvider:
     # cleanup and log memory state
     gc.collect()
     if hasattr(gc,"mem_free"):
-      self.msg(f"free memory after cleanup: {gc.mem_free()}")
+      self.log(LOG_SRC, f"free memory after cleanup: {gc.mem_free()}")
 
     if code < 400:
       # send status (with battery information)
@@ -322,14 +317,14 @@ class DataProvider:
                           f'CP API: {self._panel.id["fw_version"]}'),
            })
       except Exception as ex:
-        self.msg(f"/status: failed with exception {ex}")
+        self.log(LOG_SRC, f"/status: failed with exception {ex}")
         # clear sleep-time, but ignore exception on /status
         data.pop("sleep_time", None)
         return
-      self.msg(f"/status: {time.monotonic()-start:0.1f}s")
-      self.msg(f"api.status(): HTTP-code: {code}")
+      self.log(LOG_SRC, f"/status: {time.monotonic()-start:0.1f}s")
+      self.log(LOG_SRC, f"api.status(): HTTP-code: {code}")
       if code == 200:
-        self.msg(resp)
+        self.log(LOG_SRC, resp)
         data["sleep_time"] = resp.get("next_poll_s",30)
         s_time = resp.get("server_time", None)
         s_off  = resp.get("tz_offset_seconds", None)

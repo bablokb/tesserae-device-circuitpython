@@ -19,25 +19,18 @@ import status
 
 # --- main data-provider class   ---------------------------------------------
 
+LOG_SRC = "UIProvider"
 class UIProvider:
 
   def __init__(self):
-    self._debug   = getattr(app_config, "debug", False)
     self._display = None
     self._view    = None
 
   # --- print debug-message   ------------------------------------------------
 
-  def msg(self,text):
-    """ print (debug) message """
-    if self._debug:
-      if isinstance(text, dict):
-        print("UIProvider: {")
-        for key, value in text.items():
-          print(f"UIProvider:   {key}: {value}")
-        print("UIProvider: }")
-      else:
-        print(f"UIProvider: {text}")
+  def log(self, src, text):
+    """ print (debug) message. Override from application """
+    pass
 
   # --- create complete content   --------------------------------------------
 
@@ -59,13 +52,13 @@ class UIProvider:
     """ update data: callback for Application """
 
     if data["status"] == status.NO_UPDATE:
-      self.msg("no display update (status: no update)")
+      self.log(LOG_SRC, "no display update (status: no update)")
       return None
     if data["status"] == status.INITIAL:
-      self.msg("no display update (status: initial)")
+      self.log(LOG_SRC, "no display update (status: initial)")
       return None
     if data["status"] != status.READY:
-      self.msg("show user message (status: not ready)")
+      self.log(LOG_SRC, "show user message (status: not ready)")
       return self.show_message(data)
 
     # update display rotation (dashboard is rotated server-side)
@@ -73,16 +66,16 @@ class UIProvider:
         data["dl_mode"] == "FSCACHE"):
       self._display.rotation = 0
 
-    self.msg("processing dashboard:")
+    self.log(LOG_SRC, "processing dashboard:")
     dashboard = data["dashboard"]
     if isinstance(dashboard, tuple):
-      self.msg("  using bitmap from RAM")
+      self.log(LOG_SRC, "  using bitmap from RAM")
       bitmap, ps = dashboard
     elif isinstance(dashboard, displayio.OnDiskBitmap):
-      self.msg("  using bitmap from disk")
+      self.log(LOG_SRC, "  using bitmap from disk")
       bitmap, ps = dashboard, dashboard.pixel_shader
     else:
-      self.msg("  using pygame-surface")
+      self.log(LOG_SRC, "  using pygame-surface")
       self._view.surface = dashboard
       return self._view
 
@@ -119,7 +112,7 @@ class UIProvider:
       # fall back to en_US
       lang_file = f"lang_en_US"
       lang_module = builtins.__import__(lang_file,None,None,["MSG_TABLE"],0)
-    self.msg(f"loaded messages from {lang_file}.py")
+    self.log(LOG_SRC, f"loaded messages from {lang_file}.py")
 
     try:
       msg_text = lang_module.MSG_TABLE[status]
