@@ -53,6 +53,7 @@ Examples
   - [Template Example](#template-example)
   - [External Display](#mcu-with-an-external-busdisplay)
   - [Buttons](#buttons)
+  - [CEC](#cec)
   - [Low Memory Systems (SD caching)](#low-memory-systems)
 
 
@@ -221,6 +222,17 @@ will force a refresh of the default dashboard on every POR/wakeup.
 
 If the HAL or hw_config defines default button names, they are used as
 fallback values if the application does not define the mapping itself.
+
+
+CEC
+---
+
+Pi appliances attached to a TV set can use the remote control of the TV as a
+keypad. The only difference to normal button-support is a special
+factory method for the CEC-keypad.
+
+Installation instructions are in
+[../contrib/remote_cec/Readme.md](../contrib/remote_cec/Readme.md).
 
 
 Low Memory Systems

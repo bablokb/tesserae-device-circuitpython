@@ -45,6 +45,7 @@ This list is not a priority list.
   - [ ] Automated setup of PiOS based clients (using cloud-init)
   - [ ] Support touch displays
   - [ ] Add example configurations for more hardware devices
+  - [X] Support CEC for Pi appliances connected to a TV set
   - [X] Support buttons
   - [X] Show messages during registration
   - [X] Support memory constrained systems by caching files on SD
