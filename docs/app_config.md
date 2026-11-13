@@ -45,6 +45,7 @@ settings, see the sections below.
 | def_w_button   | str     | no    |        | default wake button name    |
 | start_delay    | int     | no    | 0      | add delay after init        |
 | logger         | method  | no    |        | return log-writer           |
+| api_timeout    | int     | no    | 5      | timeout for api-calls       |
 
 ¹ Legacy only - don't use for new configurations
 ² The name defaults to `board.board_id`
@@ -335,3 +336,10 @@ This method in turn must return the log-writer with the signature
 `def log(src,*args)`.
 
 For an example, see `src/settings_template.py`.
+
+
+api_timeout
+-----------
+
+Socket timeout for API-calls. Increase for slow connections or systems,
+e.g. for Tesserae-Cloud.

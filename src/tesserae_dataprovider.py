@@ -67,6 +67,7 @@ class DataProvider:
 
     if getattr(app_config, "debug_api", False):
       self._api.log = self.log
+    self._api.timeout(getattr(app_config, "api_timeout", 5))
 
   # --- create bitmap   ------------------------------------------------------
 

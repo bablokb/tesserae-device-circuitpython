@@ -75,6 +75,7 @@ app_config = Settings()
 app_config.url       = "http://tesserae.local:8765"
 app_config.debug     = False
 app_config.debug_api = False
+#app_config.api_timeout  = 5          # timeout for api-calls
 #app_config.run_interval = 60         # fallback run-interval
 #app_config.format   = "bmp"          # "bmp" or "png"
 
