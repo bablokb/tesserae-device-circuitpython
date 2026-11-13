@@ -45,7 +45,12 @@ class DataProvider:
     """ create API interface """
     self.log(LOG_SRC, "creating API-interface")
     if not self._wifi.radio.connected:
-      self._wifi.connect()
+      try:
+        self._wifi.connect()
+      except Exception as ex:
+        self.log(LOG_SRC, f"connection failed with exception: {ex}")
+        self._data["status"] = status.ERR_NET
+        raise
 
     self._panel = Tesserae_ID(self._data["name"],
                               self._data["device_id"],

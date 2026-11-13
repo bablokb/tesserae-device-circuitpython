@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.16.0"
+FIRMWARE_VERSION= "0.16.1"
 
 # --- imports   --------------------------------------------------------------
 
