@@ -223,6 +223,9 @@ will force a refresh of the default dashboard on every POR/wakeup.
 If the HAL or hw_config defines default button names, they are used as
 fallback values if the application does not define the mapping itself.
 
+Buttons that are *not* mapped by the application are delegated to the
+HAL/hw_config, if the method `hal.process_event(app, index)` exists.
+
 
 CEC
 ---

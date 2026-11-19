@@ -50,6 +50,16 @@ def get_logger(app):
   _app = app
   return _log
 
+# --- event processing   -----------------------------------------------------
+
+# This is a template method for processing buttons that are not mapped in the
+# application. Set `hw_config.process_event = _process_event` to activate
+# this method. Use this for functions not related to the application, but to
+# the hardware (e.g. OS-level shutdown).
+
+def _process_event(app, index):
+  print(f"======> unmapped button {index}")
+
 # hardware configuration   ---------------------------------------------------
 
 try:

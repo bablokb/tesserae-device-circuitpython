@@ -10,7 +10,7 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-FIRMWARE_VERSION= "0.16.1"
+FIRMWARE_VERSION= "0.17.0"
 
 # --- imports   --------------------------------------------------------------
 
@@ -107,12 +107,8 @@ class App(UIApplication):
 
   # --- process button events   ----------------------------------------------
 
-  def process_events(self):
-    """ process button-events """
-
-    ev = self.hal.get_key_event()
-    if not ev:
-      return False
+  def process_event(self, index):
+    """ process button-event with given button index. """
 
     # no event-id for on/off configurations
     if getattr(app_config,"always_on",False):
@@ -121,8 +117,7 @@ class App(UIApplication):
     else:
       event_id = None
 
-    index = ev[0]
-    self.log(LOG_SRC, f"button (index): {index}")
+    # record event in the data-model if a mapping exists
     try:
       btn_names = getattr(app_config, "button_names",
                           getattr(self.hal, "button_names", []))
